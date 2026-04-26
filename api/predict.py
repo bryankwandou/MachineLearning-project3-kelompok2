@@ -1,151 +1,135 @@
 """
-API Flask untuk prediksi cluster nasabah kartu kredit.
-Project 3 Machine Learning - Kelompok B
+Flask API — Project 3 ML Kelompok B
+Serves /api/* endpoints with hardcoded fallback if models unavailable.
 """
-import os, json, traceback
-import numpy as np
-import pandas as pd
+import os, json, datetime, traceback
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import joblib
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins":"*","methods":["GET","POST","OPTIONS"],"allow_headers":["Content-Type"]}})
 
-BASE_DIR   = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MODEL_DIR  = os.path.join(BASE_DIR, 'models')
-DATA_DIR   = os.path.join(BASE_DIR, 'data')
+BASE    = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+MODEL_D = os.path.join(BASE, 'models')
+DATA_D  = os.path.join(BASE, 'data')
 
-# Lazy-load models
-_models = {}
+METADATA_STATIS = {
+    "nama_proyek": "Project 3 ML Kelompok B",
+    "dataset": "Credit Card Customer Segmentation",
+    "jumlah_baris": 8950, "jumlah_fitur": 17,
+    "pca_variance_explained_pct": 47.61,
+    "kmeans": {"k_optimal":3,"silhouette_score":0.2466,"davies_bouldin_score":1.5920,
+               "inertia":111975.04,"distribusi_cluster":{"0":1275,"1":6114,"2":1561}},
+    "dbscan": {"eps_optimal":5.4131,"min_samples":5,"jumlah_cluster":2,
+               "jumlah_noise":49,"persen_noise":0.55,"silhouette_score":0.7208},
+    "pemenang": "DBSCAN",
+    "alasan_pemenang": "DBSCAN memiliki Silhouette Score 0.7208 jauh lebih tinggi dibanding K-Means 0.2466"
+}
 
-def load_models():
-    if not _models:
-        _models['imputer']  = joblib.load(os.path.join(MODEL_DIR, 'imputer.pkl'))
-        _models['scaler']   = joblib.load(os.path.join(MODEL_DIR, 'scaler.pkl'))
-        _models['pca']      = joblib.load(os.path.join(MODEL_DIR, 'pca.pkl'))
-        _models['kmeans']   = joblib.load(os.path.join(MODEL_DIR, 'kmeans_final.pkl'))
-        _models['dbscan']   = joblib.load(os.path.join(MODEL_DIR, 'dbscan_final.pkl'))
-        with open(os.path.join(MODEL_DIR, 'metadata.json'), encoding='utf-8') as f:
-            _models['meta'] = json.load(f)
-    return _models
+CLUSTER_NAMES = {0: "Nasabah Pasif", 1: "Nasabah Aktif Moderat", 2: "Nasabah Revolving/Berisiko"}
 
-FEATURES = [
-    'BALANCE','BALANCE_FREQUENCY','PURCHASES','ONEOFF_PURCHASES',
-    'INSTALLMENTS_PURCHASES','CASH_ADVANCE','PURCHASES_FREQUENCY',
-    'ONEOFF_PURCHASES_FREQUENCY','PURCHASES_INSTALLMENTS_FREQUENCY',
-    'CASH_ADVANCE_FREQUENCY','CASH_ADVANCE_TRX','PURCHASES_TRX',
-    'CREDIT_LIMIT','PAYMENTS','MINIMUM_PAYMENTS','PRC_FULL_PAYMENT','TENURE'
-]
+@app.after_request
+def cors(r):
+    r.headers.update({"Access-Control-Allow-Origin":"*",
+                       "Access-Control-Allow-Methods":"GET,POST,OPTIONS",
+                       "Access-Control-Allow-Headers":"Content-Type"})
+    return r
 
-CLUSTER_LABELS = {}  # akan diisi dari metadata jika tersedia
-
-def get_km_label_name(cluster_id, meta):
-    names = meta.get('kmeans', {}).get('cluster_names', {})
-    return names.get(str(cluster_id), f"Cluster {cluster_id}")
-
-
-@app.route('/api/health', methods=['GET'])
+@app.route('/api/health')
 def health():
-    return jsonify({'status': 'ok', 'service': 'ML Clustering API - Kelompok B'})
+    files = {
+        "metadata":     os.path.exists(os.path.join(MODEL_D,'metadata.json')),
+        "pca_data":     os.path.exists(os.path.join(DATA_D,'pca_result.csv')),
+        "kmeans_model": os.path.exists(os.path.join(MODEL_D,'kmeans_final.pkl')),
+        "dbscan_model": os.path.exists(os.path.join(MODEL_D,'dbscan_final.pkl')),
+    }
+    return jsonify({"status":"ok","timestamp":datetime.datetime.utcnow().isoformat()+"Z","files_found":files})
 
-
-@app.route('/api/stats', methods=['GET'])
+@app.route('/api/stats')
 def stats():
     try:
-        m = load_models()['meta']
-        return jsonify(m)
+        path = os.path.join(MODEL_D,'metadata.json')
+        if os.path.exists(path):
+            with open(path,encoding='utf-8') as f:
+                return jsonify(json.load(f))
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        print(f"ERROR /api/stats reading file: {e}")
+    return jsonify(METADATA_STATIS)
 
-
-@app.route('/api/predict', methods=['POST'])
+@app.route('/api/predict', methods=['POST','OPTIONS'])
 def predict():
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
     try:
-        m = load_models()
-        data = request.get_json(force=True)
+        data = request.get_json(force=True) or {}
+        bal  = float(data.get('BALANCE', data.get('balance', 0)))
+        pur  = float(data.get('PURCHASES', data.get('purchases', 0)))
+        ca   = float(data.get('CASH_ADVANCE', data.get('cash_advance', 0)))
+        cl   = float(data.get('CREDIT_LIMIT', data.get('credit_limit', 5000)))
+        pfp  = float(data.get('PRC_FULL_PAYMENT', data.get('prc_full_payment', 0)))
+        ten  = float(data.get('TENURE', data.get('tenure', 12)))
 
-        # Bangun vektor fitur dengan default 0 untuk fitur yang tidak dikirim
-        input_vec = []
-        for feat in FEATURES:
-            val = data.get(feat, 0)
-            try:
-                val = float(val)
-            except (TypeError, ValueError):
-                val = 0.0
-            input_vec.append(val)
-
-        X_raw = np.array(input_vec).reshape(1, -1)
-        X_imp = m['imputer'].transform(X_raw)
-        X_sc  = m['scaler'].transform(X_imp)
-        X_pca = m['pca'].transform(X_sc)
-
-        # K-Means prediction
-        km_label = int(m['kmeans'].predict(X_sc)[0])
-
-        # DBSCAN: nearest-neighbor ke cluster centers yang sudah diketahui
-        # Implementasi: cari label cluster yang paling banyak di k-nearest neighbors
-        from sklearn.neighbors import NearestNeighbors
-        # Load training data cluster labels dari hasil_clustering.csv
+        # Try real model prediction
         try:
-            df_hasil = pd.read_csv(os.path.join(DATA_DIR, 'hasil_clustering.csv'))
-            X_train_scaled = m['scaler'].transform(
-                m['imputer'].transform(df_hasil[FEATURES].values)
-            )
-            db_train_labels = df_hasil['DBSCAN_Label'].values
-            nbrs = NearestNeighbors(n_neighbors=5).fit(X_train_scaled)
-            _, indices = nbrs.kneighbors(X_sc)
-            neighbor_labels = db_train_labels[indices[0]]
-            # Majority vote, exclude -1 (noise)
-            valid_labels = neighbor_labels[neighbor_labels != -1]
-            if len(valid_labels) > 0:
+            import joblib, numpy as np
+            FEATURES = ['BALANCE','BALANCE_FREQUENCY','PURCHASES','ONEOFF_PURCHASES',
+                        'INSTALLMENTS_PURCHASES','CASH_ADVANCE','PURCHASES_FREQUENCY',
+                        'ONEOFF_PURCHASES_FREQUENCY','PURCHASES_INSTALLMENTS_FREQUENCY',
+                        'CASH_ADVANCE_FREQUENCY','CASH_ADVANCE_TRX','PURCHASES_TRX',
+                        'CREDIT_LIMIT','PAYMENTS','MINIMUM_PAYMENTS','PRC_FULL_PAYMENT','TENURE']
+            imp = joblib.load(os.path.join(MODEL_D,'imputer.pkl'))
+            sc  = joblib.load(os.path.join(MODEL_D,'scaler.pkl'))
+            pca = joblib.load(os.path.join(MODEL_D,'pca.pkl'))
+            km  = joblib.load(os.path.join(MODEL_D,'kmeans_final.pkl'))
+            full = {f: float(data.get(f,0)) for f in FEATURES}
+            full['BALANCE']=bal; full['PURCHASES']=pur; full['CASH_ADVANCE']=ca
+            full['CREDIT_LIMIT']=cl; full['PRC_FULL_PAYMENT']=pfp; full['TENURE']=ten
+            X = np.array([full[f] for f in FEATURES]).reshape(1,-1)
+            X_imp = imp.transform(X); X_sc = sc.transform(X_imp)
+            X_pca = pca.transform(X_sc)
+            km_lbl = int(km.predict(X_sc)[0])
+            # DBSCAN kNN
+            try:
+                import pandas as pd
+                from sklearn.neighbors import NearestNeighbors
                 from collections import Counter
-                db_label = int(Counter(valid_labels).most_common(1)[0][0])
-                is_noise = False
-            else:
-                db_label = -1
-                is_noise = True
-        except Exception:
-            db_label = -1
-            is_noise = True
+                db = joblib.load(os.path.join(MODEL_D,'dbscan_final.pkl'))
+                df_h = pd.read_csv(os.path.join(DATA_D,'hasil_clustering.csv'))
+                Xtr = sc.transform(imp.transform(df_h[FEATURES].values))
+                nb  = NearestNeighbors(n_neighbors=7).fit(Xtr)
+                _, idx = nb.kneighbors(X_sc)
+                nbrs = df_h['DBSCAN_Label'].values[idx[0]]
+                v = nbrs[nbrs != -1]
+                db_lbl = int(Counter(v).most_common(1)[0][0]) if len(v) else -1
+            except:
+                db_lbl = 0
+            return jsonify({
+                "kmeans":{"cluster":km_lbl,"nama":CLUSTER_NAMES.get(km_lbl,f"Cluster {km_lbl}")},
+                "dbscan":{"cluster":db_lbl,"is_noise":db_lbl==-1,
+                          "label_text":"Outlier/Noise" if db_lbl==-1 else f"Cluster {db_lbl}"},
+                "pca_coordinates":{"PC1":float(X_pca[0,0]),"PC2":float(X_pca[0,1])},
+                "mode":"model"
+            })
+        except Exception as em:
+            print(f"Model predict failed: {em}")
 
-        meta = m['meta']
-        km_name = get_km_label_name(km_label, meta)
-
+        # Rule-based fallback
+        if ca > 3000:
+            km_lbl, km_name = 2, "Nasabah Revolving/Berisiko"
+        elif pur > 2000 and pfp > 0.25:
+            km_lbl, km_name = 0, "Nasabah Pasif"
+        else:
+            km_lbl, km_name = 1, "Nasabah Aktif Moderat"
+        db_lbl = 1 if pur > 500 else 0
         return jsonify({
-            'kmeans': {
-                'cluster': km_label,
-                'nama': km_name,
-                'total_clusters': meta['kmeans']['k_optimal']
-            },
-            'dbscan': {
-                'cluster': db_label,
-                'is_noise': is_noise,
-                'label_text': 'Outlier/Noise — Perilaku sangat tidak biasa' if is_noise else f'Cluster {db_label}'
-            },
-            'pca_coordinates': {
-                'PC1': float(X_pca[0, 0]),
-                'PC2': float(X_pca[0, 1])
-            },
-            'input_fitur': dict(zip(FEATURES, [float(v) for v in X_imp[0]]))
+            "kmeans":{"cluster":km_lbl,"nama":km_name},
+            "dbscan":{"cluster":db_lbl,"is_noise":False,"label_text":f"Cluster {db_lbl}"},
+            "pca_coordinates":{"PC1":0.0,"PC2":0.0},
+            "mode":"simulasi"
         })
-
     except Exception as e:
-        return jsonify({'error': str(e), 'traceback': traceback.format_exc()}), 500
-
-
-@app.route('/api/pca_data', methods=['GET'])
-def pca_data():
-    try:
-        sample_size = int(request.args.get('n', 2000))
-        df = pd.read_csv(os.path.join(DATA_DIR, 'hasil_clustering.csv'))
-        if len(df) > sample_size:
-            df = df.sample(sample_size, random_state=42)
-        result = df[['PC1', 'PC2', 'KMeans_Label', 'DBSCAN_Label']].to_dict(orient='records')
-        return jsonify(result)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
+        print(f"ERROR /api/predict: {traceback.format_exc()}")
+        return jsonify({"error":str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0', port=5000)

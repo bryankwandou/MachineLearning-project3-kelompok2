@@ -3,33 +3,14 @@
   "builds": [
     {
       "src": "api/predict.py",
-      "use": "@vercel/python"
-    },
-    {
-      "src": "frontend/index.html",
-      "use": "@vercel/static"
+      "use": "@vercel/python",
+      "config": { "maxLambdaSize": "50mb" }
     }
   ],
   "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "api/predict.py"
-    },
-    {
-      "src": "/data/(.*)",
-      "dest": "data/$1"
-    },
-    {
-      "src": "/reports/(.*)",
-      "dest": "reports/$1"
-    },
-    {
-      "src": "/models/metadata.json",
-      "dest": "models/metadata.json"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "frontend/index.html"
-    }
+    { "src": "/api/(.*)", "dest": "/api/predict.py" },
+    { "src": "/data/(.*)", "dest": "/data/$1" },
+    { "src": "/reports/(.*)", "dest": "/reports/$1" },
+    { "src": "/(.*)", "dest": "/frontend/$1" }
   ]
 }

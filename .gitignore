@@ -4,3 +4,5 @@ __pycache__/
 _state.json
 _results.json
 run_pipeline.py
+
+.vercel
