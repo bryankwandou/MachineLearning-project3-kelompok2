@@ -1,0 +1,25 @@
+PERBANDINGAN K-MEANS vs DBSCAN
+Dataset: Credit Card Customer Segmentation (N = 8950 nasabah)
+───────────────────────────────────────────────────────────────────────────────
+Kriteria                     │ K-Means                │ DBSCAN                
+───────────────────────────────────────────────────────────────────────────────
+Metode penentuan K           │ Elbow + Silhouette     │ Otomatis (densitas)   
+Parameter                    │ K = 3                  │ eps=5.413, min_s=5    
+Jumlah cluster               │ 3                      │ 2                     
+Noise/Outlier                │ 0 (tidak ada)          │ 49 (0.6%)             
+Silhouette Score ↑           │ 0.2466                 │ 0.7208                
+Davies-Bouldin ↓             │ 1.5920                 │ N/A                   
+Inertia                      │ 111975                 │ N/A                   
+Bentuk cluster               │ Globular/bulat         │ Arbitrer (bebas)      
+Keunggulan                   │ Sederhana, cepat       │ Deteksi outlier otomatis
+Kelemahan                    │ K harus ditentukan     │ Sensitif eps          
+Cocok untuk                  │ Segmentasi marketing   │ Deteksi anomali/fraud 
+───────────────────────────────────────────────────────────────────────────────
+PEMENANG (Silhouette): DBSCAN
+───────────────────────────────────────────────────────────────────────────────
+
+KESIMPULAN:
+  DBSCAN unggul Silhouette (0.7208 vs 0.2466) pada dataset ini.
+  Selain itu mendeteksi 49 outlier (0.6%) secara otomatis.
+  K-Means tetap berguna untuk segmentasi bisnis yang mudah dijelaskan ke stakeholder.
+  Rekomendasi: DBSCAN untuk anomali, K-Means untuk kampanye marketing.

@@ -1,0 +1,28 @@
+{
+  "nama_proyek": "Project 3 ML Kelompok B",
+  "dataset": "Credit Card Customer Segmentation",
+  "jumlah_baris": 8950,
+  "jumlah_fitur": 17,
+  "pca_variance_explained_pct": 47.6115,
+  "kmeans": {
+    "k_optimal": 3,
+    "silhouette_score": 0.2466,
+    "davies_bouldin_score": 1.592,
+    "inertia": 111975.04,
+    "distribusi_cluster": {
+      "0": 1275,
+      "1": 6114,
+      "2": 1561
+    }
+  },
+  "dbscan": {
+    "eps_optimal": 5.4131,
+    "min_samples": 5,
+    "jumlah_cluster": 2,
+    "jumlah_noise": 49,
+    "persen_noise": 0.55,
+    "silhouette_score": 0.7208
+  },
+  "pemenang": "DBSCAN",
+  "alasan_pemenang": "DBSCAN menang Silhouette lebih tinggi (K-Means:0.2466 vs DBSCAN:0.7208). DBSCAN unggul deteksi 49 outlier."
+}

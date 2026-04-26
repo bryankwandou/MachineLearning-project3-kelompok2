@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Segmentasi Nasabah Kartu Kredit | Kelompok B</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --primary: #1a237e;
+      --primary-light: #3949ab;
+      --accent: #42a5f5;
+      --bg: #f5f7fa;
+      --card: #ffffff;
+      --text: #1a1a2e;
+      --muted: #6c757d;
+      --border: #e0e0e0;
+      --c0: #e41a1c; --c1: #377eb8; --c2: #4daf4a; --c3: #984ea3;
+      --c4: #ff7f00; --c5: #a65628; --c6: #f781bf; --c7: #999999;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); }
+
+    /* HEADER */
+    header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white; padding: 2.5rem 2rem 2rem; text-align: center;
+      box-shadow: 0 4px 20px rgba(26,35,126,0.3);
+    }
+    header h1 { font-size: 2.2rem; font-weight: 700; letter-spacing: -0.5px; }
+    header p.sub { font-size: 1.1rem; opacity: 0.85; margin-top: 0.5rem; }
+    header p.info { font-size: 0.9rem; opacity: 0.7; margin-top: 0.3rem; }
+    .badge { display: inline-block; background: rgba(255,255,255,0.15); border-radius: 20px;
+             padding: 0.25rem 0.9rem; font-size: 0.82rem; margin: 0.2rem; }
+
+    /* MAIN LAYOUT */
+    main { max-width: 1400px; margin: 0 auto; padding: 2rem 1.5rem; }
+    section { margin-bottom: 2.5rem; }
+    section h2 { font-size: 1.4rem; font-weight: 700; color: var(--primary);
+                 border-left: 4px solid var(--accent); padding-left: 0.75rem;
+                 margin-bottom: 1.2rem; }
+
+    /* CARDS */
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 1rem; }
+    .card { background: var(--card); border-radius: 12px; padding: 1.5rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08); text-align: center;
+            border-top: 4px solid var(--primary); transition: transform .2s; }
+    .card:hover { transform: translateY(-3px); }
+    .card .val { font-size: 2.4rem; font-weight: 800; color: var(--primary); }
+    .card .lbl { font-size: 0.85rem; color: var(--muted); margin-top: 0.3rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .card:nth-child(2) { border-top-color: #00897b; } .card:nth-child(2) .val { color: #00897b; }
+    .card:nth-child(3) { border-top-color: #e53935; } .card:nth-child(3) .val { color: #e53935; }
+    .card:nth-child(4) { border-top-color: #fb8c00; } .card:nth-child(4) .val { color: #fb8c00; }
+
+    /* TABLE */
+    .table-wrap { overflow-x: auto; background: var(--card); border-radius: 12px;
+                  box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th { background: var(--primary); color: white; padding: 0.75rem 1rem; text-align: left; font-weight: 600; }
+    td { padding: 0.65rem 1rem; border-bottom: 1px solid var(--border); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f0f4ff; }
+    .winner { background: #e8f5e9 !important; font-weight: 700; color: #2e7d32; }
+
+    /* CHART CONTAINER */
+    .chart-wrap { background: var(--card); border-radius: 12px; padding: 1.5rem;
+                  box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+    .chart-controls { display: flex; gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .btn { padding: 0.5rem 1.2rem; border: none; border-radius: 8px; cursor: pointer;
+           font-size: 0.9rem; font-weight: 600; transition: all .2s; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover, .btn-primary.active { background: var(--primary-light); }
+    .btn-secondary { background: #e3f2fd; color: var(--primary); }
+    .btn-secondary:hover, .btn-secondary.active { background: var(--accent); color: white; }
+
+    /* PREDICT FORM */
+    .predict-card { background: var(--card); border-radius: 12px; padding: 2rem;
+                    box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+    .sliders-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 1.2rem; margin-bottom: 1.5rem; }
+    .slider-row label { display: flex; justify-content: space-between; font-size: 0.85rem;
+                        font-weight: 600; color: var(--text); margin-bottom: 0.3rem; }
+    .slider-row label span { color: var(--accent); font-weight: 700; }
+    input[type=range] { width: 100%; accent-color: var(--primary); }
+    .predict-btn { background: linear-gradient(135deg, var(--primary), var(--primary-light));
+                   color: white; border: none; padding: 1rem 3rem; font-size: 1.1rem;
+                   font-weight: 700; border-radius: 10px; cursor: pointer;
+                   box-shadow: 0 4px 15px rgba(26,35,126,0.3); transition: all .2s; display: block; width: 100%; }
+    .predict-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(26,35,126,0.4); }
+    .predict-result { display: none; margin-top: 1.5rem; padding: 1.5rem;
+                      background: #e8f5e9; border-radius: 10px; border-left: 5px solid #2e7d32; }
+    .predict-result h3 { color: #2e7d32; margin-bottom: 0.75rem; }
+    .result-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .result-box { flex: 1; min-width: 200px; background: white; border-radius: 8px; padding: 1rem;
+                  border-left: 4px solid var(--primary); }
+    .result-box .method { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+    .result-box .cluster-name { font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-top: 0.25rem; }
+    .result-box.noise { border-left-color: #e53935; }
+    .result-box.noise .cluster-name { color: #e53935; }
+
+    /* GALLERY */
+    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap: 1.2rem; }
+    .gallery-item { background: var(--card); border-radius: 10px; overflow: hidden;
+                    box-shadow: 0 2px 12px rgba(0,0,0,0.08); cursor: pointer; transition: transform .2s; }
+    .gallery-item:hover { transform: scale(1.02); }
+    .gallery-item img { width: 100%; height: 200px; object-fit: contain; padding: 0.5rem; background: #fafafa; }
+    .gallery-item .cap { padding: 0.6rem 0.9rem; font-size: 0.82rem; color: var(--muted); border-top: 1px solid var(--border); }
+
+    /* LIGHTBOX */
+    #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000;
+                align-items: center; justify-content: center; }
+    #lightbox.open { display: flex; }
+    #lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 8px; }
+    #lightbox-close { position: absolute; top: 1rem; right: 1.5rem; color: white; font-size: 2rem;
+                      cursor: pointer; background: none; border: none; }
+
+    /* CLUSTER CARDS */
+    .cluster-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 1.2rem; }
+    .cluster-card { border-radius: 12px; padding: 1.5rem; border-top: 5px solid;
+                    box-shadow: 0 2px 12px rgba(0,0,0,0.08); background: white; }
+    .cluster-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .cluster-card .count { font-size: 0.82rem; color: var(--muted); margin-bottom: 0.75rem; }
+    .cluster-card .chars { font-size: 0.82rem; line-height: 1.6; margin-bottom: 0.75rem; }
+    .cluster-card .rec { font-size: 0.8rem; background: rgba(0,0,0,0.04); border-radius: 6px;
+                          padding: 0.5rem 0.75rem; line-height: 1.5; }
+
+    footer { background: var(--primary); color: rgba(255,255,255,0.75); text-align: center;
+             padding: 1.5rem; font-size: 0.85rem; margin-top: 3rem; }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.5rem; }
+      .predict-btn { font-size: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Segmentasi Nasabah Kartu Kredit</h1>
+  <p class="sub">K-Means Clustering vs DBSCAN — Project 3 Machine Learning</p>
+  <p class="info">
+    <span class="badge">Kelompok B</span>
+    <span class="badge">Brad</span>
+    <span class="badge">Annaliese</span>
+    <span class="badge">Vincentius</span>
+    <span class="badge">Mike</span>
+    <span class="badge">UAJM 2026</span>
+  </p>
+</header>
+
+<main>
+
+  <!-- SECTION 1: STATISTICS CARDS -->
+  <section>
+    <h2>Ringkasan Proyek</h2>
+    <div class="cards-grid">
+      <div class="card">
+        <div class="val" id="stat-rows">—</div>
+        <div class="lbl">Total Nasabah</div>
+      </div>
+      <div class="card">
+        <div class="val">17</div>
+        <div class="lbl">Jumlah Fitur</div>
+      </div>
+      <div class="card">
+        <div class="val" id="stat-km-k">—</div>
+        <div class="lbl">Cluster K-Means</div>
+      </div>
+      <div class="card">
+        <div class="val" id="stat-db-noise">—</div>
+        <div class="lbl">Outlier DBSCAN</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: PERBANDINGAN METRIK -->
+  <section>
+    <h2>Perbandingan Metrik Model</h2>
+    <div class="table-wrap">
+      <table id="metrics-table">
+        <thead>
+          <tr>
+            <th>Metrik</th>
+            <th>K-Means</th>
+            <th>DBSCAN</th>
+          </tr>
+        </thead>
+        <tbody id="metrics-tbody">
+          <tr><td colspan="3" style="text-align:center;padding:2rem;color:var(--muted)">Memuat data...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SECTION 3: SCATTER PLOT INTERAKTIF -->
+  <section>
+    <h2>Visualisasi Scatter Plot Interaktif (PCA 2D)</h2>
+    <div class="chart-wrap">
+      <div class="chart-controls">
+        <button class="btn btn-primary active" id="btn-kmeans" onclick="switchChart('kmeans')">K-Means</button>
+        <button class="btn btn-secondary" id="btn-dbscan" onclick="switchChart('dbscan')">DBSCAN</button>
+        <span style="font-size:0.82rem;color:var(--muted);align-self:center;">Hover titik untuk detail cluster</span>
+      </div>
+      <canvas id="scatter-chart" height="400"></canvas>
+    </div>
+  </section>
+
+  <!-- SECTION 4: FORM PREDIKSI -->
+  <section>
+    <h2>Coba Prediksi Cluster Nasabah Baru</h2>
+    <div class="predict-card">
+      <div class="sliders-grid">
+        <div class="slider-row">
+          <label>Saldo Kartu Kredit (BALANCE) <span id="val-BALANCE">0</span></label>
+          <input type="range" id="sl-BALANCE" min="0" max="19043" step="100" value="1000"
+                 oninput="document.getElementById('val-BALANCE').textContent=this.value">
+        </div>
+        <div class="slider-row">
+          <label>Total Pembelian (PURCHASES) <span id="val-PURCHASES">0</span></label>
+          <input type="range" id="sl-PURCHASES" min="0" max="49039" step="100" value="500"
+                 oninput="document.getElementById('val-PURCHASES').textContent=this.value">
+        </div>
+        <div class="slider-row">
+          <label>Penarikan Tunai (CASH_ADVANCE) <span id="val-CASH_ADVANCE">0</span></label>
+          <input type="range" id="sl-CASH_ADVANCE" min="0" max="47137" step="100" value="0"
+                 oninput="document.getElementById('val-CASH_ADVANCE').textContent=this.value">
+        </div>
+        <div class="slider-row">
+          <label>Limit Kartu (CREDIT_LIMIT) <span id="val-CREDIT_LIMIT">0</span></label>
+          <input type="range" id="sl-CREDIT_LIMIT" min="50" max="30000" step="50" value="5000"
+                 oninput="document.getElementById('val-CREDIT_LIMIT').textContent=this.value">
+        </div>
+        <div class="slider-row">
+          <label>Rasio Bayar Lunas (PRC_FULL_PAYMENT) <span id="val-PRC_FULL_PAYMENT">0.00</span></label>
+          <input type="range" id="sl-PRC_FULL_PAYMENT" min="0" max="1" step="0.01" value="0.1"
+                 oninput="document.getElementById('val-PRC_FULL_PAYMENT').textContent=parseFloat(this.value).toFixed(2)">
+        </div>
+        <div class="slider-row">
+          <label>Lama Nasabah / bulan (TENURE) <span id="val-TENURE">12</span></label>
+          <input type="range" id="sl-TENURE" min="6" max="12" step="1" value="12"
+                 oninput="document.getElementById('val-TENURE').textContent=this.value">
+        </div>
+      </div>
+      <button class="predict-btn" onclick="predictCluster()">PREDIKSI CLUSTER SAYA</button>
+      <div class="predict-result" id="predict-result">
+        <h3>Hasil Prediksi</h3>
+        <div class="result-row" id="result-row"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5: GALERI VISUALISASI -->
+  <section>
+    <h2>Galeri Visualisasi</h2>
+    <div class="gallery-grid" id="gallery-grid">
+      <!-- diisi oleh JS -->
+    </div>
+  </section>
+
+  <!-- SECTION 6: INTERPRETASI BISNIS -->
+  <section>
+    <h2>Interpretasi Bisnis Cluster K-Means</h2>
+    <div class="cluster-cards" id="cluster-cards">
+      <!-- diisi oleh JS setelah metadata dimuat -->
+    </div>
+  </section>
+
+</main>
+
+<!-- LIGHTBOX -->
+<div id="lightbox" onclick="closeLightbox()">
+  <button id="lightbox-close" onclick="closeLightbox()">✕</button>
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<footer>
+  <p>Project 3 Machine Learning | Kelompok B (Brad, Annaliese, Vincentius, Mike) | UAJM 2026</p>
+  <p>Teknologi: Python 3.12 · scikit-learn · Flask · Vercel &nbsp;|&nbsp;
+    <a href="https://github.com/nayrbryanGaming/MachineLearning-project3-kelompok2" target="_blank">GitHub Repository</a>
+  </p>
+</footer>
+
+<script>
+// ──────────────────────────────────────────────────
+// CONFIG
+// ──────────────────────────────────────────────────
+const API_BASE = '';   // sama-origin di Vercel
+const CLUSTER_COLORS = ['#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#a65628','#f781bf','#999999','#00CED1','#FFD700'];
+const NOISE_COLOR = '#333333';
+
+const GALLERY_ITEMS = [
+  { file: '01_distribusi_fitur.png',        cap: 'Distribusi 9 fitur utama dataset' },
+  { file: '02_missing_values.png',           cap: 'Analisis missing values sebelum preprocessing' },
+  { file: '03_elbow_method.png',             cap: 'Elbow Method — penentuan K optimal' },
+  { file: '04_silhouette_score.png',         cap: 'Silhouette Score per K' },
+  { file: '05_kdistance_dbscan.png',         cap: 'K-Distance Graph — penentuan eps optimal' },
+  { file: '06_kmeans_scatter.png',           cap: 'Hasil K-Means Clustering (PCA 2D)' },
+  { file: '07_dbscan_scatter.png',           cap: 'Hasil DBSCAN Clustering (PCA 2D)' },
+  { file: '08_perbandingan_side_by_side.png',cap: 'Perbandingan K-Means vs DBSCAN berdampingan' },
+  { file: '09_cluster_heatmap.png',          cap: 'Profil karakteristik rata-rata per cluster' },
+  { file: '10_distribusi_cluster.png',       cap: 'Distribusi jumlah nasabah per cluster' },
+  { file: '11_pca_variance.png',             cap: 'PCA — explained variance per komponen' },
+];
+
+const CLUSTER_BISNIS = [
+  { color: '--c0', title: 'Nasabah Premium', char: 'PRC_FULL_PAYMENT tinggi, PURCHASES besar, CREDIT_LIMIT tinggi, jarang cash advance.', rec: 'Tawarkan cashback eksklusif, upgrade limit, akses lounge bandara.' },
+  { color: '--c1', title: 'Nasabah Berisiko', char: 'CASH_ADVANCE sangat tinggi, PURCHASES rendah, tanda tekanan keuangan.', rec: 'Pantau ketat, tawarkan pinjaman formal bunga rendah sebagai alternatif.' },
+  { color: '--c2', title: 'Nasabah Revolving', char: 'BALANCE tinggi, PRC_FULL_PAYMENT rendah, terjebak cicilan berbunga.', rec: 'Program cicilan 0%, konsultasi keuangan, restrukturisasi hutang.' },
+  { color: '--c3', title: 'Nasabah Pasif', char: 'Semua fitur rendah, hampir tidak pernah menggunakan kartu.', rec: 'Promo aktivasi, bonus transaksi pertama, ancaman penutupan jika tidak aktif.' },
+];
+
+// ──────────────────────────────────────────────────
+// LOAD METADATA
+// ──────────────────────────────────────────────────
+let meta = null;
+let pcaData = null;
+let scatterChart = null;
+let currentView = 'kmeans';
+
+async function loadMeta() {
+  try {
+    const r = await fetch('/models/metadata.json');
+    meta = await r.json();
+    document.getElementById('stat-rows').textContent = meta.jumlah_baris.toLocaleString('id');
+    document.getElementById('stat-km-k').textContent = meta.kmeans.k_optimal;
+    document.getElementById('stat-db-noise').textContent = meta.dbscan.persen_noise.toFixed(1) + '%';
+    buildMetricsTable();
+    buildClusterCards();
+  } catch (e) {
+    console.warn('metadata.json belum tersedia:', e);
+    // Fallback static values
+    document.getElementById('stat-rows').textContent = '8,950';
+    document.getElementById('stat-km-k').textContent = '—';
+    document.getElementById('stat-db-noise').textContent = '—';
+  }
+}
+
+function buildMetricsTable() {
+  if (!meta) return;
+  const km = meta.kmeans, db = meta.dbscan;
+  const winner = meta.pemenang;
+  const rows = [
+    ['Jumlah Cluster', km.k_optimal, db.jumlah_cluster],
+    ['Silhouette Score ↑', km.silhouette_score.toFixed(4), db.silhouette_score.toFixed(4)],
+    ['Davies-Bouldin ↓', km.davies_bouldin_score.toFixed(4), 'N/A'],
+    ['Data Noise/Outlier', '0%', db.persen_noise.toFixed(1) + '% (' + db.jumlah_noise + ' nasabah)'],
+    ['Parameter', `K = ${km.k_optimal}`, `eps = ${db.eps_optimal}, min_samples = ${db.min_samples}`],
+    ['Pemenang (Silhouette)', winner === 'K-Means' ? '✓ MENANG' : '—', winner === 'DBSCAN' ? '✓ MENANG' : '—'],
+  ];
+  const tbody = document.getElementById('metrics-tbody');
+  tbody.innerHTML = rows.map(([c, k, d]) => {
+    const isWinnerRow = c.includes('Pemenang');
+    return `<tr class="${isWinnerRow ? 'winner' : ''}"><td>${c}</td><td>${k}</td><td>${d}</td></tr>`;
+  }).join('');
+}
+
+// ──────────────────────────────────────────────────
+// SCATTER CHART
+// ──────────────────────────────────────────────────
+async function loadAndDrawChart() {
+  try {
+    const r = await fetch('/api/pca_data?n=2000');
+    pcaData = await r.json();
+  } catch (e) {
+    // fallback: try static CSV
+    try {
+      const r = await fetch('/data/pca_result.csv');
+      const text = await r.text();
+      const lines = text.trim().split('\n');
+      pcaData = lines.slice(1).map(l => {
+        const [pc1, pc2] = l.split(',');
+        return { PC1: parseFloat(pc1), PC2: parseFloat(pc2), KMeans_Label: 0, DBSCAN_Label: 0 };
+      });
+    } catch (e2) { console.warn('Cannot load PCA data', e2); return; }
+  }
+  drawScatter('kmeans');
+}
+
+function drawScatter(mode) {
+  if (!pcaData) return;
+  currentView = mode;
+
+  // Group points by label
+  const groups = {};
+  pcaData.forEach(pt => {
+    const lbl = mode === 'kmeans' ? pt.KMeans_Label : pt.DBSCAN_Label;
+    if (!groups[lbl]) groups[lbl] = { x: [], y: [] };
+    groups[lbl].x.push(pt.PC1);
+    groups[lbl].y.push(pt.PC2);
+  });
+
+  const datasets = Object.entries(groups).sort((a,b) => a[0]-b[0]).map(([lbl, pts]) => {
+    const isNoise = parseInt(lbl) === -1;
+    const colorIdx = isNoise ? -1 : parseInt(lbl) % CLUSTER_COLORS.length;
+    return {
+      label: isNoise ? 'Noise/Outlier' : `Cluster ${lbl}`,
+      data: pts.x.map((x, i) => ({ x, y: pts.y[i] })),
+      backgroundColor: isNoise ? NOISE_COLOR + '44' : CLUSTER_COLORS[colorIdx] + '88',
+      borderColor: isNoise ? NOISE_COLOR : CLUSTER_COLORS[colorIdx],
+      borderWidth: 0.5,
+      pointRadius: isNoise ? 2 : 3,
+      pointStyle: isNoise ? 'cross' : 'circle',
+    };
+  });
+
+  const ctx = document.getElementById('scatter-chart').getContext('2d');
+  if (scatterChart) scatterChart.destroy();
+  scatterChart = new Chart(ctx, {
+    type: 'scatter',
+    data: { datasets },
+    options: {
+      responsive: true,
+      animation: { duration: 400 },
+      plugins: {
+        legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } },
+        title: { display: true, text: mode === 'kmeans' ? 'K-Means Clustering (PCA 2D)' : 'DBSCAN Clustering (PCA 2D)', font: { size: 14, weight: 'bold' } },
+        tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: (${ctx.parsed.x.toFixed(2)}, ${ctx.parsed.y.toFixed(2)})` } }
+      },
+      scales: {
+        x: { title: { display: true, text: 'Principal Component 1' } },
+        y: { title: { display: true, text: 'Principal Component 2' } }
+      }
+    }
+  });
+}
+
+function switchChart(mode) {
+  document.getElementById('btn-kmeans').className = 'btn ' + (mode==='kmeans' ? 'btn-primary active' : 'btn-secondary');
+  document.getElementById('btn-dbscan').className  = 'btn ' + (mode==='dbscan'  ? 'btn-primary active' : 'btn-secondary');
+  drawScatter(mode);
+}
+
+// ──────────────────────────────────────────────────
+// PREDIKSI
+// ──────────────────────────────────────────────────
+async function predictCluster() {
+  const payload = {
+    BALANCE:           parseFloat(document.getElementById('sl-BALANCE').value),
+    PURCHASES:         parseFloat(document.getElementById('sl-PURCHASES').value),
+    CASH_ADVANCE:      parseFloat(document.getElementById('sl-CASH_ADVANCE').value),
+    CREDIT_LIMIT:      parseFloat(document.getElementById('sl-CREDIT_LIMIT').value),
+    PRC_FULL_PAYMENT:  parseFloat(document.getElementById('sl-PRC_FULL_PAYMENT').value),
+    TENURE:            parseFloat(document.getElementById('sl-TENURE').value),
+  };
+
+  const resultDiv = document.getElementById('predict-result');
+  const rowDiv = document.getElementById('result-row');
+  rowDiv.innerHTML = '<p style="color:var(--muted)">Memproses...</p>';
+  resultDiv.style.display = 'block';
+
+  try {
+    const r = await fetch('/api/predict', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await r.json();
+    if (data.error) throw new Error(data.error);
+
+    rowDiv.innerHTML = `
+      <div class="result-box">
+        <div class="method">K-Means</div>
+        <div class="cluster-name">Cluster ${data.kmeans.cluster}</div>
+        <div style="font-size:.8rem;color:var(--muted);margin-top:.3rem">${data.kmeans.nama}</div>
+      </div>
+      <div class="result-box ${data.dbscan.is_noise ? 'noise' : ''}">
+        <div class="method">DBSCAN</div>
+        <div class="cluster-name">${data.dbscan.label_text}</div>
+        <div style="font-size:.8rem;color:var(--muted);margin-top:.3rem">
+          PC1=${data.pca_coordinates.PC1.toFixed(3)}, PC2=${data.pca_coordinates.PC2.toFixed(3)}
+        </div>
+      </div>
+    `;
+
+    // Tambah titik prediksi ke scatter chart
+    if (scatterChart) {
+      const newPoint = { x: data.pca_coordinates.PC1, y: data.pca_coordinates.PC2 };
+      scatterChart.data.datasets.push({
+        label: '★ Nasabah Baru',
+        data: [newPoint],
+        backgroundColor: '#ff1744',
+        borderColor: '#ff1744',
+        pointRadius: 12,
+        pointStyle: 'star',
+        borderWidth: 2,
+      });
+      scatterChart.update();
+    }
+  } catch (e) {
+    rowDiv.innerHTML = `<p style="color:#e53935">Error: ${e.message}. Pastikan API berjalan.</p>`;
+  }
+}
+
+// ──────────────────────────────────────────────────
+// GALERI
+// ──────────────────────────────────────────────────
+function buildGallery() {
+  const grid = document.getElementById('gallery-grid');
+  grid.innerHTML = GALLERY_ITEMS.map(item => `
+    <div class="gallery-item" onclick="openLightbox('/reports/${item.file}')">
+      <img src="/reports/${item.file}" alt="${item.cap}" loading="lazy" onerror="this.style.display='none'">
+      <div class="cap">${item.cap}</div>
+    </div>
+  `).join('');
+}
+
+function openLightbox(src) {
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+}
+
+// ──────────────────────────────────────────────────
+// CLUSTER CARDS
+// ──────────────────────────────────────────────────
+function buildClusterCards() {
+  const container = document.getElementById('cluster-cards');
+  const k = meta ? meta.kmeans.k_optimal : 4;
+  const dist = meta ? meta.kmeans.distribusi_cluster : {};
+  const total = meta ? meta.jumlah_baris : 8950;
+
+  const borderColors = ['#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#a65628'];
+  const cards = Array.from({ length: k }, (_, i) => {
+    const info = CLUSTER_BISNIS[i % CLUSTER_BISNIS.length];
+    const count = dist[String(i)] || '—';
+    const pct = typeof count === 'number' ? ((count / total) * 100).toFixed(1) : '—';
+    return `
+      <div class="cluster-card" style="border-top-color:${borderColors[i % borderColors.length]}">
+        <h3 style="color:${borderColors[i % borderColors.length]}">Cluster ${i} — ${info.title}</h3>
+        <div class="count">${typeof count === 'number' ? count.toLocaleString('id') : count} nasabah (${pct}%)</div>
+        <div class="chars">${info.char}</div>
+        <div class="rec"><strong>Rekomendasi:</strong> ${info.rec}</div>
+      </div>
+    `;
+  }).join('');
+  container.innerHTML = cards;
+}
+
+// ──────────────────────────────────────────────────
+// INIT
+// ──────────────────────────────────────────────────
+(async () => {
+  buildGallery();
+  buildClusterCards();  // show placeholder cards immediately
+  await loadMeta();
+  await loadAndDrawChart();
+})();
+</script>
+</body>
+</html>

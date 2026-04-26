@@ -1,0 +1,66 @@
+===============================================================
+RINGKASAN HASIL PROJECT 3 ML KELOMPOK B
+===============================================================
+
+URL VERCEL  : https://machinelearning-kelompok2.vercel.app/
+URL GITHUB  : https://github.com/nayrbryanGaming/MachineLearning-project3-kelompok2
+
+---------------------------------------------------------------
+HASIL EVALUASI K-MEANS
+---------------------------------------------------------------
+K Optimal          : 3 (dipilih berdasarkan Silhouette Score)
+Silhouette Score   : 0.2466
+Davies-Bouldin     : 1.5920
+Inertia            : 111975.04
+Distribusi Cluster :
+  Cluster 0 : 1275 nasabah (14.2%)
+  Cluster 1 : 6114 nasabah (68.3%)
+  Cluster 2 : 1561 nasabah (17.4%)
+
+---------------------------------------------------------------
+HASIL EVALUASI DBSCAN
+---------------------------------------------------------------
+eps Optimal        : 5.4131
+min_samples        : 5
+Jumlah Cluster     : 2
+Noise/Outlier      : 49 nasabah (0.55%)
+Silhouette Score   : 0.7208
+
+---------------------------------------------------------------
+PCA
+---------------------------------------------------------------
+Variance PC1+PC2   : 47.61%
+
+---------------------------------------------------------------
+PEMENANG
+---------------------------------------------------------------
+DBSCAN unggul Silhouette Score lebih tinggi (0.7208 vs 0.2466).
+K-Means tetap berguna untuk segmentasi marketing (3 segmen jelas).
+DBSCAN ideal untuk deteksi anomali/fraud (49 outlier terdeteksi).
+
+---------------------------------------------------------------
+FILE YANG DIHASILKAN
+---------------------------------------------------------------
+data/preprocessed.csv
+data/pca_result.csv
+data/hasil_clustering.csv
+models/kmeans_final.pkl
+models/dbscan_final.pkl
+models/scaler.pkl
+models/pca.pkl
+models/imputer.pkl
+models/metadata.json
+reports/01_distribusi_fitur.png
+reports/02_missing_values.png
+reports/03_elbow_method.png
+reports/04_silhouette_score.png
+reports/05_kdistance_dbscan.png
+reports/06_kmeans_scatter.png
+reports/07_dbscan_scatter.png
+reports/08_perbandingan_side_by_side.png
+reports/09_cluster_heatmap.png
+reports/10_distribusi_cluster.png
+reports/11_pca_variance.png
+reports/interpretasi_bisnis.txt
+reports/tabel_perbandingan.txt
+===============================================================

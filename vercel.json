@@ -1,0 +1,35 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/predict.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "frontend/index.html",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "api/predict.py"
+    },
+    {
+      "src": "/data/(.*)",
+      "dest": "data/$1"
+    },
+    {
+      "src": "/reports/(.*)",
+      "dest": "reports/$1"
+    },
+    {
+      "src": "/models/metadata.json",
+      "dest": "models/metadata.json"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "frontend/index.html"
+    }
+  ]
+}
