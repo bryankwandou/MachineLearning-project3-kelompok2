@@ -110,10 +110,21 @@ tr:last-child td{border-bottom:none}
 .interp-card .tag{display:inline-block;padding:.2rem .65rem;border-radius:20px;font-size:.72rem;font-weight:700;margin-bottom:.5rem}
 
 .gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem}
-.gallery-item{background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);cursor:pointer;transition:transform .2s,box-shadow .2s}
-.gallery-item:hover{transform:translateY(-4px);box-shadow:0 8px 28px rgba(26,35,126,.18)}
-.gallery-item img{width:100%;height:160px;object-fit:cover;display:block;background:#e8eaf6}
-.gallery-caption{padding:.6rem .8rem;font-size:.78rem;color:var(--muted);font-weight:600}
+.gallery-item{background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);cursor:pointer;transition:transform .25s ease,box-shadow .25s ease;position:relative}
+.gallery-item:hover{transform:translateY(-4px);box-shadow:0 8px 28px rgba(26,35,126,.22)}
+.gallery-item .img-wrap{position:relative;overflow:hidden}
+.gallery-item img{width:100%;height:160px;object-fit:cover;display:block;background:#e8eaf6;transition:transform .25s ease}
+.gallery-item:hover img{transform:scale(1.04)}
+.gallery-item .img-overlay{position:absolute;inset:0;background:rgba(26,35,126,.45);opacity:0;transition:opacity .25s ease;display:flex;align-items:center;justify-content:center;font-size:2rem}
+.gallery-item:hover .img-overlay{opacity:1}
+.gallery-caption{padding:.6rem .8rem;font-size:.78rem;color:var(--muted);font-weight:600;transition:transform .25s ease}
+.gallery-item:hover .gallery-caption{transform:translateY(-4px)}
+
+.conclusion-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.2rem}
+@media(max-width:640px){.conclusion-grid{grid-template-columns:1fr}}
+.conclusion-card{background:var(--card);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow);border-left:5px solid}
+.conclusion-card h4{font-size:1rem;font-weight:700;margin-bottom:.6rem}
+.conclusion-card p{font-size:.84rem;color:var(--muted);line-height:1.6}
 
 .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:1000;align-items:center;justify-content:center;padding:1rem}
 .lightbox.open{display:flex}
@@ -180,6 +191,7 @@ footer p{margin:.2rem 0}
     <a href="#interpretasi" class="nav-item">Interpretasi</a>
     <a href="#gallery" class="nav-item">Grafik</a>
     <a href="#prediksi" class="nav-item">Prediksi</a>
+    <a href="#kesimpulan" class="nav-item">Kesimpulan</a>
     <a href="#unduhan" class="nav-item">Unduhan</a>
   </div>
 </nav>
@@ -252,6 +264,29 @@ footer p{margin:.2rem 0}
       <div class="result-box" id="result-box">
         <strong>Hasil Prediksi:</strong>
         <div class="result-grid" id="result-grid"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- KESIMPULAN -->
+  <section id="kesimpulan">
+    <div class="section-title">📋 Kesimpulan Penelitian</div>
+    <div class="conclusion-grid">
+      <div class="conclusion-card" style="border-left-color:var(--navy)">
+        <h4 style="color:var(--navy)">🔬 Temuan Utama</h4>
+        <p>DBSCAN terbukti lebih unggul untuk dataset Credit Card ini. Silhouette Score DBSCAN 0.7208 berbanding K-Means 0.2466 — hampir 3 kali lipat lebih baik. Ini disebabkan distribusi data nasabah yang tidak membentuk cluster bulat simetris, melainkan cluster dengan kepadatan berbeda yang hanya bisa ditangkap DBSCAN.</p>
+      </div>
+      <div class="conclusion-card" style="border-left-color:var(--green2)">
+        <h4 style="color:var(--green2)">💼 Nilai Bisnis</h4>
+        <p>49 nasabah outlier yang ditemukan DBSCAN adalah nasabah dengan perilaku finansial ekstrem yang membutuhkan perhatian khusus bank. 3 segmen K-Means memberikan peta jalan pemasaran yang jelas: aktivasi nasabah pasif, upselling nasabah aktif, restrukturisasi nasabah revolving.</p>
+      </div>
+      <div class="conclusion-card" style="border-left-color:var(--orange)">
+        <h4 style="color:var(--orange)">⚠️ Keterbatasan</h4>
+        <p>PCA hanya merepresentasikan 47.61% varians data dalam 2 dimensi. Ini berarti 52.39% informasi tidak terlihat di scatter plot. K-Means tetap relevan untuk kebutuhan segmentasi sederhana yang membutuhkan interpretasi mudah dan kecepatan komputasi tinggi.</p>
+      </div>
+      <div class="conclusion-card" style="border-left-color:var(--purple)">
+        <h4 style="color:var(--purple)">🚀 Rekomendasi Lanjutan</h4>
+        <p>Penelitian berikutnya dapat mencoba HDBSCAN untuk parameter yang lebih adaptif, menambahkan data temporal histori transaksi, dan membandingkan dengan Gaussian Mixture Model. Deployment API prediksi real-time juga dapat diperkuat dengan model ensemble.</p>
       </div>
     </div>
   </section>
@@ -493,8 +528,11 @@ function initInterpretasi() {
 function initGallery() {
   document.getElementById('gallery-grid').innerHTML = GALLERIES.map(g =>
     `<div class="gallery-item" data-src="${g.src}" data-caption="${g.caption}">
-      <img src="${g.src}" alt="${g.caption}" loading="lazy"
-           onerror="this.style.height='80px';this.style.background='#e8eaf6';this.alt='(belum dihasilkan)'">
+      <div class="img-wrap">
+        <img src="${g.src}" alt="${g.caption}" loading="lazy"
+             onerror="this.style.cssText='height:100px;object-fit:none;background:linear-gradient(135deg,#e8eaf6,#c5cae9)';this.alt='';this.insertAdjacentHTML('afterend','<div style=\'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px\'><span style=\'font-size:13px;font-weight:600;color:#555;text-align:center;padding:0 8px\'>${g.src.split(\'/\').pop()}</span><span style=\'font-size:11px;color:#888\'>Jalankan ulang stage4_reports.py</span></div>')">
+        <div class="img-overlay">🔍</div>
+      </div>
       <div class="gallery-caption">${g.caption}</div>
     </div>`
   ).join('');
