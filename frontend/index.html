@@ -611,10 +611,31 @@ const DOWNLOAD_FILES = [
   { label:"📋 Tabel Perbandingan",   href:"/reports/tabel_perbandingan.txt" }
 ];
 
+// ═══ CACHE HELPERS (sessionStorage, per-tab, cleared when tab closes) ═════════
+// Prevents repeat Lambda calls and repeat CSV downloads on every refresh.
+const CACHE_KEY_HEALTH = 'ml3_health';
+const CACHE_KEY_PCA    = 'ml3_pca';
+const CACHE_TTL_HEALTH = 10 * 60 * 1000;  // 10 minutes
+const CACHE_TTL_PCA    = 60 * 60 * 1000;  // 60 minutes (CSV doesn't change between deploys)
+
+function cacheGet(key, maxAgeMs) {
+  try {
+    const raw = sessionStorage.getItem(key);
+    if (!raw) return null;
+    const { ts, v } = JSON.parse(raw);
+    if (Date.now() - ts > maxAgeMs) { sessionStorage.removeItem(key); return null; }
+    return v;
+  } catch { return null; }
+}
+function cacheSet(key, value) {
+  try { sessionStorage.setItem(key, JSON.stringify({ ts: Date.now(), v: value })); } catch {}
+}
+
 // ═══ MODULE STATE ══════════════════════════════════════════════════════════════
 let _pcaData = [];           // sampled PCA data for mini scatter
 let _miniScatterChart = null;
 let _countersDone = false;
+const _predictCache = new Map(); // in-memory: same inputs → same result, no re-call
 
 // ═══ initStats ════════════════════════════════════════════════════════════════
 function initStats() {
@@ -823,15 +844,22 @@ function initScatterPlot() {
     stat.textContent = 'Mode demo — pca_result.csv tidak tersedia';
   }
 
+  // Check sessionStorage cache first — avoids re-downloading 500KB CSV on every refresh
+  const cached = cacheGet(CACHE_KEY_PCA, CACHE_TTL_PCA);
+  if (cached) {
+    _pcaData = cached.pts;
+    buildChart(cached.datasets, cached.title);
+    stat.textContent = `Data dari cache: ${cached.n.toLocaleString()} titik (hemat bandwidth)`;
+    return;
+  }
+
   Papa.parse('/data/pca_result.csv', {
     download:true, header:true, skipEmptyLines:true,
     complete(res) {
       const rows = res.data;
       if (!rows.length || !('PC1' in rows[0]) || !('KMeans_Label' in rows[0])) { useDemoData(); return; }
-      // Sample every ~9th point for performance (keep ~1000 pts)
       const step = Math.max(1, Math.floor(rows.length / 1000));
       const sampled = rows.filter((_,i) => i%step===0);
-      // Store for mini scatter
       _pcaData = sampled.map(r => ({ x:parseFloat(r.PC1), y:parseFloat(r.PC2), km:parseInt(r.KMeans_Label) }));
       const byCluster = {};
       sampled.forEach(r => {
@@ -845,8 +873,11 @@ function initScatterPlot() {
         backgroundColor: (KM_COLORS[parseInt(lbl)]||'#999')+'aa',
         pointRadius: 3
       }));
-      buildChart(datasets, `PCA 2D — K-Means Clusters (${rows.length.toLocaleString()} data)`);
+      const title = `PCA 2D — K-Means Clusters (${rows.length.toLocaleString()} data)`;
+      buildChart(datasets, title);
       stat.textContent = `Data asli: ${rows.length.toLocaleString()} titik dimuat`;
+      // Save to sessionStorage for next refresh within this tab session
+      cacheSet(CACHE_KEY_PCA, { pts: _pcaData, datasets, title, n: rows.length });
     },
     error() { useDemoData(); }
   });
@@ -972,17 +1003,29 @@ function initPrediksi() {
 
   form.addEventListener('submit', async e => {
     e.preventDefault();
-    spin.style.display = 'inline-block';
     const body = {};
     PREDICT_FIELDS.forEach(f => { body[f.id] = parseFloat(document.getElementById(f.id).value) || 0; });
+
+    // In-memory cache: same numeric inputs → skip API call entirely
+    const cacheKey = JSON.stringify(body);
+    if (_predictCache.has(cacheKey)) {
+      showResult(_predictCache.get(cacheKey));
+      return;
+    }
+
+    spin.style.display = 'inline-block';
     try {
       const res = await fetch('/api/predict', {
         method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)
       });
       if (!res.ok) throw new Error('HTTP '+res.status);
-      showResult(await res.json());
+      const data = await res.json();
+      _predictCache.set(cacheKey, data);
+      showResult(data);
     } catch {
-      showResult(localFallback(body));
+      const fb = localFallback(body);
+      _predictCache.set(cacheKey, fb);
+      showResult(fb);
     } finally {
       spin.style.display = 'none';
     }
@@ -992,9 +1035,23 @@ function initPrediksi() {
 // ═══ initAPIStatus ════════════════════════════════════════════════════════════
 function initAPIStatus() {
   const dot=document.getElementById('api-dot'), text=document.getElementById('api-text');
+
+  // Cache health status for 10 min — avoids invoking the Lambda on every refresh
+  const hit = cacheGet(CACHE_KEY_HEALTH, CACHE_TTL_HEALTH);
+  if (hit) {
+    dot.classList.add('ok');
+    text.textContent = 'API Online — ' + hit.substring(0, 10) + ' (cached)';
+    return;
+  }
+
   fetch('/api/health')
     .then(r=>r.json())
-    .then(d=>{ dot.classList.add('ok'); text.textContent='API Online — '+(d.timestamp||'').substring(0,10); })
+    .then(d=>{
+      dot.classList.add('ok');
+      const ts = d.timestamp || new Date().toISOString();
+      text.textContent = 'API Online — ' + ts.substring(0,10);
+      cacheSet(CACHE_KEY_HEALTH, ts);
+    })
     .catch(()=>{ dot.classList.add('err'); text.textContent='API Offline — Mode Simulasi Aktif'; });
 }
 
