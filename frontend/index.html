@@ -23,9 +23,15 @@
 html{scroll-behavior:smooth}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.6}
 
+/* ── SPINNER ── */
 .spin{display:inline-block;width:18px;height:18px;border:3px solid #c5cae9;border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
 @keyframes spin{to{transform:rotate(360deg)}}
 
+/* ── FADE-IN SECTIONS ── */
+.fade-section{opacity:0;transform:translateY(22px);transition:opacity .45s ease-out,transform .45s ease-out}
+.fade-section.visible{opacity:1;transform:translateY(0)}
+
+/* ── HEADER ── */
 header{background:var(--navy);color:#fff;padding:2.5rem 2rem 2rem;text-align:center;position:relative;overflow:hidden}
 header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 70% 50%,rgba(255,255,255,.06) 0%,transparent 60%);pointer-events:none}
 header h1{font-size:clamp(1.5rem,3vw,2.2rem);font-weight:800;letter-spacing:-.5px;text-shadow:0 2px 8px rgba(0,0,0,.3)}
@@ -37,15 +43,25 @@ header .sub{font-size:clamp(.88rem,2vw,1rem);opacity:.85;margin-top:.4rem}
 .status-dot.err{background:#f44336}
 #api-status-badge{font-size:.78rem;opacity:.85;margin-top:.6rem}
 
+/* ── NAV ── */
+.nav{background:var(--navy2);position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(26,35,126,.3)}
+.nav-inner{max-width:1280px;margin:0 auto;display:flex;gap:0;overflow-x:auto;padding:0 1rem;scrollbar-width:none}
+.nav-inner::-webkit-scrollbar{display:none}
+.nav-item{color:rgba(255,255,255,.7);padding:.7rem 1rem;font-size:.8rem;font-weight:600;text-decoration:none;white-space:nowrap;transition:color .2s,border-bottom .2s;border-bottom:3px solid transparent}
+.nav-item:hover{color:#fff;border-bottom-color:rgba(255,255,255,.4)}
+.nav-item.active{color:var(--gold);border-bottom-color:var(--gold)}
+
+/* ── MAIN ── */
 main{max-width:1280px;margin:0 auto;padding:2rem 1.5rem}
 section{margin-bottom:2.8rem}
 .section-title{font-size:1.25rem;font-weight:700;color:var(--navy);border-left:4px solid var(--blue3);padding-left:.75rem;margin-bottom:1.4rem;display:flex;align-items:center;gap:.5rem}
 
+/* ── STAT CARDS ── */
 .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
 @media(max-width:768px){.stat-grid{grid-template-columns:repeat(2,1fr)}}
 .stat-card{background:var(--card);border-radius:var(--radius);padding:1.5rem 1rem;text-align:center;box-shadow:var(--shadow);border-top:4px solid;transition:transform .2s,box-shadow .2s}
 .stat-card:hover{transform:translateY(-4px);box-shadow:0 8px 30px rgba(26,35,126,.15)}
-.stat-card .val{font-size:2.5rem;font-weight:800;line-height:1.1}
+.stat-card .val{font-size:2.5rem;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}
 .stat-card .lbl{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:.4rem}
 .stat-card .sub-lbl{font-size:.72rem;color:var(--muted);margin-top:.2rem}
 .stat-card:nth-child(1){border-top-color:var(--navy)} .stat-card:nth-child(1) .val{color:var(--navy)}
@@ -53,11 +69,13 @@ section{margin-bottom:2.8rem}
 .stat-card:nth-child(3){border-top-color:var(--red)} .stat-card:nth-child(3) .val{color:var(--red)}
 .stat-card:nth-child(4){border-top-color:var(--orange)} .stat-card:nth-child(4) .val{color:var(--orange)}
 
-.winner-banner{background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:var(--radius);padding:1.4rem 2rem;display:flex;align-items:center;gap:1.2rem;box-shadow:0 4px 20px rgba(249,168,37,.35);margin-bottom:2rem}
+/* ── WINNER BANNER ── */
+.winner-banner{background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:var(--radius);padding:1.4rem 2rem;display:flex;align-items:center;gap:1.2rem;box-shadow:0 4px 20px rgba(249,168,37,.35);margin-bottom:1.5rem}
 .winner-trophy{font-size:2.8rem;flex-shrink:0}
 .winner-banner h2{font-size:1.4rem;font-weight:800;color:#4e3000}
 .winner-banner p{font-size:.88rem;color:#5d3a00;margin-top:.2rem;line-height:1.5}
 
+/* ── TABLE ── */
 .table-wrap{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
 table{width:100%;border-collapse:collapse;font-size:.88rem}
 thead th{background:var(--navy);color:#fff;padding:.8rem 1rem;font-weight:600;text-align:left}
@@ -68,7 +86,24 @@ tbody tr:hover td{background:#c5cae9}
 td{padding:.65rem 1rem;border-bottom:1px solid var(--border)}
 tr:last-child td{border-bottom:none}
 .win-cell{background:#e8f5e9 !important;color:var(--green2);font-weight:700;border:2px solid var(--green3) !important}
+.hi-std{background:#fffde7 !important}
 
+/* ── EXPLANATION BOX ── */
+.explain-box{background:var(--card);border-radius:var(--radius);padding:1.5rem 2rem;box-shadow:var(--shadow);margin-top:1.5rem}
+.explain-box h4{color:var(--navy);font-size:1rem;font-weight:700;margin-bottom:.8rem;display:flex;align-items:center;gap:.5rem}
+.explain-box p{font-size:.87rem;color:#444;line-height:1.7;margin-bottom:.7rem}
+.explain-box p:last-child{margin-bottom:0}
+.explain-box.highlight{border-left:4px solid var(--blue3)}
+
+/* ── ALGO GUIDE TABLE ── */
+.guide-table-wrap{margin-top:1.5rem}
+.guide-table-wrap h4{color:var(--navy);font-weight:700;font-size:.95rem;margin-bottom:.8rem}
+.guide-table-wrap table thead th{background:var(--navy2)}
+.guide-badge{display:inline-block;padding:.15rem .5rem;border-radius:10px;font-size:.75rem;font-weight:700}
+.guide-badge.km{background:#e3f2fd;color:var(--blue)}
+.guide-badge.db{background:#f3e5f5;color:var(--purple)}
+
+/* ── METODOLOGI ── */
 .flow{display:flex;align-items:flex-start;gap:0;overflow-x:auto;padding:.5rem 0}
 @media(max-width:600px){.flow{flex-direction:column;align-items:center}}
 .flow-step{text-align:center;min-width:130px;flex:1;position:relative}
@@ -84,6 +119,7 @@ tr:last-child td{border-bottom:none}
 .flow-step:nth-child(7) .icon-box{background:linear-gradient(135deg,#fff3e0,#ffe0b2)}
 .flow-step:nth-child(9) .icon-box{background:linear-gradient(135deg,#e8eaf6,#7986cb)}
 
+/* ── ALGO CARDS ── */
 .algo-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
 @media(max-width:640px){.algo-grid{grid-template-columns:1fr}}
 .algo-card{border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow)}
@@ -98,40 +134,76 @@ tr:last-child td{border-bottom:none}
 .algo-card.km .mval{color:var(--blue)}
 .algo-card.db .mval{color:var(--purple)}
 
-.chart-wrap{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:1.5rem;position:relative}
+/* ── SCATTER ── */
+.chart-wrap{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:1.5rem;position:relative;min-height:220px}
 .chart-wrap canvas{max-height:420px}
 #chart-status{font-size:.8rem;color:var(--muted);text-align:center;margin-top:.6rem}
+.scatter-skeleton{padding:2.5rem;text-align:center;display:none}
+.scatter-skeleton.show{display:block}
+.skeleton-shimmer{width:100%;height:360px;border-radius:8px;background:linear-gradient(90deg,#e8eaf6 25%,#c5cae9 50%,#e8eaf6 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.skeleton-text{margin-top:1rem;font-size:.85rem;color:var(--muted)}
 
+/* ── INTERPRETASI ── */
 .interp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
 @media(max-width:768px){.interp-grid{grid-template-columns:1fr}}
 .interp-card{background:var(--card);border-radius:var(--radius);padding:1.4rem;box-shadow:var(--shadow);border-left:5px solid}
 .interp-card h4{font-size:.95rem;font-weight:700;margin-bottom:.5rem}
 .interp-card p{font-size:.82rem;color:var(--muted);line-height:1.55}
 .interp-card .tag{display:inline-block;padding:.2rem .65rem;border-radius:20px;font-size:.72rem;font-weight:700;margin-bottom:.5rem}
+.mini-bar-section{margin-bottom:.7rem}
+.mini-bar-section .mb-title{font-size:.75rem;font-weight:600;color:#555;margin-bottom:.35rem}
+.mini-bar-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.28rem}
+.mini-bar-row .mb-label{font-size:.7rem;color:var(--muted);width:90px;flex-shrink:0}
+.mini-bar-row .mb-track{flex:1;height:8px;background:#e8eaf6;border-radius:4px;overflow:hidden}
+.mini-bar-row .mb-fill{height:100%;border-radius:4px;transition:width .6s ease}
+.mini-bar-row .mb-pct{font-size:.7rem;color:#555;width:32px;text-align:right;flex-shrink:0}
 
+/* ── GALLERY ── */
 .gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem}
 .gallery-item{background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);cursor:pointer;transition:transform .25s ease,box-shadow .25s ease;position:relative}
 .gallery-item:hover{transform:translateY(-4px);box-shadow:0 8px 28px rgba(26,35,126,.22)}
 .gallery-item .img-wrap{position:relative;overflow:hidden}
 .gallery-item img{width:100%;height:160px;object-fit:cover;display:block;background:#e8eaf6;transition:transform .25s ease}
 .gallery-item:hover img{transform:scale(1.04)}
-.gallery-item .img-overlay{position:absolute;inset:0;background:rgba(26,35,126,.45);opacity:0;transition:opacity .25s ease;display:flex;align-items:center;justify-content:center;font-size:2rem}
+.gallery-item .img-overlay{position:absolute;inset:0;background:rgba(26,35,126,.42);opacity:0;transition:opacity .25s ease;display:flex;align-items:center;justify-content:center;font-size:2.2rem}
 .gallery-item:hover .img-overlay{opacity:1}
 .gallery-caption{padding:.6rem .8rem;font-size:.78rem;color:var(--muted);font-weight:600;transition:transform .25s ease}
-.gallery-item:hover .gallery-caption{transform:translateY(-4px)}
+.gallery-item:hover .gallery-caption{transform:translateY(-3px)}
 
-.conclusion-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.2rem}
-@media(max-width:640px){.conclusion-grid{grid-template-columns:1fr}}
-.conclusion-card{background:var(--card);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow);border-left:5px solid}
-.conclusion-card h4{font-size:1rem;font-weight:700;margin-bottom:.6rem}
-.conclusion-card p{font-size:.84rem;color:var(--muted);line-height:1.6}
-
+/* ── LIGHTBOX ── */
 .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:1000;align-items:center;justify-content:center;padding:1rem}
 .lightbox.open{display:flex}
 .lightbox img{max-width:92vw;max-height:88vh;border-radius:10px;box-shadow:0 8px 40px rgba(0,0,0,.6)}
 .lb-close{position:absolute;top:1rem;right:1.5rem;color:#fff;font-size:2rem;cursor:pointer;line-height:1;background:none;border:none}
 .lb-caption{position:absolute;bottom:1.5rem;left:50%;transform:translateX(-50%);color:#fff;font-size:.88rem;background:rgba(0,0,0,.55);padding:.3rem 1rem;border-radius:20px;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
 
+/* ── STATS DESCRIPTIVE ── */
+.stats-insight-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1.2rem}
+@media(max-width:640px){.stats-insight-grid{grid-template-columns:1fr}}
+.stats-insight-card{border-radius:var(--radius);padding:1.2rem;box-shadow:var(--shadow)}
+.stats-insight-card h4{font-size:.9rem;font-weight:700;margin-bottom:.5rem}
+.stats-insight-card p{font-size:.82rem;color:#444;line-height:1.6}
+
+/* ── KESIMPULAN ── */
+.conclusion-grid{display:grid;grid-template-columns:3fr 2fr;gap:1.5rem;align-items:start}
+@media(max-width:768px){.conclusion-grid{grid-template-columns:1fr}}
+.conclusion-cards{display:grid;gap:1rem}
+.conclusion-card{background:var(--card);border-radius:var(--radius);padding:1.4rem;box-shadow:var(--shadow);border-top:4px solid}
+.conclusion-card h4{font-size:.95rem;font-weight:700;margin-bottom:.5rem}
+.conclusion-card p{font-size:.83rem;color:#444;line-height:1.65}
+.summary-box{background:var(--card);border-radius:var(--radius);padding:1.4rem;box-shadow:var(--shadow);position:sticky;top:80px}
+.summary-box h4{font-size:.9rem;font-weight:700;color:var(--navy);margin-bottom:.8rem;border-bottom:2px solid var(--border);padding-bottom:.5rem}
+.summary-metric{display:flex;justify-content:space-between;padding:.35rem 0;font-size:.82rem;border-bottom:1px solid var(--border)}
+.summary-metric:last-of-type{border-bottom:none}
+.summary-metric .sm-val{font-weight:700;color:var(--navy)}
+.winner-metric{background:#e8f5e9;border-radius:8px;padding:.6rem .8rem;margin-top:.8rem;text-align:center;font-size:.85rem;font-weight:700;color:var(--green2)}
+.ref-list{margin-top:1rem}
+.ref-list h5{font-size:.8rem;font-weight:700;color:var(--navy2);margin-bottom:.5rem}
+.ref-item{font-size:.75rem;color:var(--muted);padding:.3rem 0;border-bottom:1px solid var(--border);line-height:1.5}
+.ref-item em{color:var(--blue)}
+
+/* ── PREDICT ── */
 .predict-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:2rem}
 .form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
 @media(max-width:640px){.form-grid{grid-template-columns:1fr}}
@@ -142,26 +214,41 @@ tr:last-child td{border-bottom:none}
 .btn-predict:hover{background:var(--navy2);transform:translateY(-1px)}
 .result-box{margin-top:1.5rem;background:#f5f5ff;border-radius:var(--radius);padding:1.5rem;display:none}
 .result-box.show{display:block}
-.result-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-top:1rem}
-@media(max-width:600px){.result-grid{grid-template-columns:1fr}}
+.result-top{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem}
+@media(max-width:640px){.result-top{grid-template-columns:1fr}}
 .result-item{background:var(--card);border-radius:10px;padding:1rem;text-align:center;box-shadow:0 2px 10px rgba(26,35,126,.08)}
 .result-item .r-label{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
 .result-item .r-value{font-size:1.2rem;font-weight:800;color:var(--navy);margin-top:.2rem}
 .mode-badge{display:inline-block;padding:.2rem .6rem;border-radius:12px;font-size:.72rem;font-weight:700;margin-top:.6rem}
 .mode-badge.model{background:#e8f5e9;color:var(--green2)}
 .mode-badge.simulasi{background:#fff3e0;color:var(--orange)}
+.result-bottom{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem}
+@media(max-width:640px){.result-bottom{grid-template-columns:1fr}}
+.risk-box{background:var(--card);border-radius:10px;padding:1.2rem;box-shadow:0 2px 10px rgba(26,35,126,.08)}
+.risk-box .risk-title{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.5rem}
+.risk-badge{display:inline-flex;align-items:center;gap:.4rem;padding:.4rem 1rem;border-radius:20px;font-size:.9rem;font-weight:700;margin-bottom:.7rem}
+.risk-recs{list-style:none}
+.risk-recs li{font-size:.79rem;color:#444;padding:.25rem 0;border-bottom:1px solid var(--border);display:flex;gap:.4rem}
+.risk-recs li:last-child{border-bottom:none}
+.risk-recs li::before{content:'→';color:var(--blue3);flex-shrink:0}
+.mini-scatter-box{background:var(--card);border-radius:10px;padding:1rem;box-shadow:0 2px 10px rgba(26,35,126,.08);text-align:center}
+.mini-scatter-box .ms-title{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.5rem}
+#mini-scatter-chart{max-height:210px}
 
+/* ── DOWNLOAD ── */
 .download-section{display:flex;flex-wrap:wrap;gap:.8rem}
 .btn-dl{padding:.6rem 1.2rem;border-radius:8px;border:1.5px solid var(--navy);color:var(--navy);background:transparent;font-size:.85rem;font-weight:600;cursor:pointer;transition:background .2s,color .2s;text-decoration:none;display:inline-flex;align-items:center;gap:.4rem}
 .btn-dl:hover{background:var(--navy);color:#fff}
 
+/* ── BACK TO TOP ── */
+#back-top{position:fixed;bottom:2rem;right:2rem;background:var(--navy);color:#fff;border:none;border-radius:50%;width:46px;height:46px;font-size:1.2rem;cursor:pointer;box-shadow:0 4px 16px rgba(26,35,126,.35);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0;opacity:0;transform:translateY(20px);transition:opacity .3s,transform .3s,background .2s;pointer-events:none;z-index:999}
+#back-top.show{opacity:1;transform:translateY(0);pointer-events:auto}
+#back-top:hover{background:var(--blue)}
+#back-top span{font-size:.55rem;letter-spacing:.5px;line-height:1}
+
+/* ── FOOTER ── */
 footer{background:var(--navy);color:#fff;text-align:center;padding:2rem 1rem;margin-top:2rem;font-size:.85rem;opacity:.9}
 footer p{margin:.2rem 0}
-
-.nav{background:var(--navy2);position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(26,35,126,.3)}
-.nav-inner{max-width:1280px;margin:0 auto;display:flex;gap:0;overflow-x:auto;padding:0 1rem}
-.nav-item{color:rgba(255,255,255,.75);padding:.7rem 1rem;font-size:.82rem;font-weight:600;text-decoration:none;white-space:nowrap;transition:color .2s,border-bottom .2s;border-bottom:3px solid transparent}
-.nav-item:hover,.nav-item.active{color:#fff;border-bottom-color:var(--blue3)}
 </style>
 </head>
 <body>
@@ -184,118 +271,222 @@ footer p{margin:.2rem 0}
 
 <nav class="nav">
   <div class="nav-inner">
-    <a href="#overview" class="nav-item">Overview</a>
-    <a href="#metodologi" class="nav-item">Metodologi</a>
-    <a href="#tabel" class="nav-item">Perbandingan</a>
-    <a href="#scatter" class="nav-item">Scatter Plot</a>
-    <a href="#interpretasi" class="nav-item">Interpretasi</a>
-    <a href="#gallery" class="nav-item">Grafik</a>
-    <a href="#prediksi" class="nav-item">Prediksi</a>
-    <a href="#kesimpulan" class="nav-item">Kesimpulan</a>
-    <a href="#unduhan" class="nav-item">Unduhan</a>
+    <a href="#overview"            class="nav-item">Overview</a>
+    <a href="#statistik-deskriptif" class="nav-item">Statistik</a>
+    <a href="#metodologi"          class="nav-item">Metodologi</a>
+    <a href="#tabel"               class="nav-item">Perbandingan</a>
+    <a href="#scatter"             class="nav-item">Scatter Plot</a>
+    <a href="#interpretasi"        class="nav-item">Interpretasi</a>
+    <a href="#gallery"             class="nav-item">Grafik</a>
+    <a href="#kesimpulan"          class="nav-item">Kesimpulan</a>
+    <a href="#prediksi"            class="nav-item">Prediksi</a>
+    <a href="#unduhan"             class="nav-item">Unduhan</a>
   </div>
 </nav>
 
 <main>
 
-  <!-- OVERVIEW -->
-  <section id="overview">
-    <div class="section-title">📊 Overview Dataset &amp; Hasil</div>
-    <div class="stat-grid" id="stat-grid"></div>
-  </section>
+<!-- OVERVIEW ─────────────────────────────────────────────────────────── -->
+<section id="overview" class="fade-section">
+  <div class="section-title">📊 Overview Dataset &amp; Hasil</div>
+  <div class="stat-grid" id="stat-grid"></div>
+</section>
 
-  <!-- METODOLOGI -->
-  <section id="metodologi">
-    <div class="section-title">🔬 Alur Metodologi</div>
-    <div class="flow" id="flow-steps"></div>
-  </section>
+<!-- STATISTIK DESKRIPTIF ─────────────────────────────────────────────── -->
+<section id="statistik-deskriptif" class="fade-section">
+  <div class="section-title">📈 Analisis Statistik Deskriptif Dataset</div>
+  <p style="font-size:.88rem;color:var(--muted);margin-bottom:1rem">Memahami karakteristik data sebelum pemodelan — prasyarat wajib sebelum menerapkan algoritma clustering.</p>
 
-  <!-- PERBANDINGAN -->
-  <section id="tabel">
-    <div class="section-title">📋 Perbandingan K-Means vs DBSCAN</div>
-    <div id="winner-container"></div>
+  <div class="table-wrap" style="margin-bottom:1.2rem">
+    <table>
+      <thead><tr>
+        <th>Fitur</th><th>Min</th><th>Max</th><th>Mean</th><th>Std Dev</th><th>Distribusi</th>
+      </tr></thead>
+      <tbody id="stats-table-body"></tbody>
+    </table>
+  </div>
+  <p style="font-size:.78rem;color:var(--muted);margin-bottom:1.2rem;font-style:italic">
+    Baris dengan latar kuning = Std Dev > Mean, menandakan distribusi sangat skewed (miring kanan) — umum pada data finansial.
+  </p>
+
+  <div class="stats-insight-grid">
+    <div class="stats-insight-card" style="background:linear-gradient(135deg,#e3f2fd,#fff)">
+      <h4 style="color:var(--blue)">📈 Distribusi Tidak Normal</h4>
+      <p>Mayoritas fitur memiliki distribusi sangat miring ke kanan (<em>right-skewed</em>). Sebagian besar nasabah memiliki BALANCE dan PURCHASES rendah, namun beberapa nasabah memiliki nilai ekstrem yang sangat tinggi. Ini adalah karakteristik data finansial yang umum — validasi bahwa StandardScaler diperlukan.</p>
+    </div>
+    <div class="stats-insight-card" style="background:linear-gradient(135deg,#fff3e0,#fff)">
+      <h4 style="color:var(--orange)">⚠️ Missing Values Ditemukan</h4>
+      <p>313 baris (3.5%) memiliki nilai kosong di MINIMUM_PAYMENTS. 1 baris kosong di CREDIT_LIMIT. Keduanya ditangani dengan <strong>imputasi median</strong> — lebih robust dari mean untuk data skewed. Ini mencegah bias pada model clustering.</p>
+    </div>
+    <div class="stats-insight-card" style="background:linear-gradient(135deg,#e8f5e9,#fff)">
+      <h4 style="color:var(--green2)">⚖️ Skala Heterogen</h4>
+      <p>BALANCE mencapai 19.043 sementara TENURE hanya 6-12. Tanpa standardisasi, K-Means dan DBSCAN akan terdominasi fitur bernilai besar. <strong>StandardScaler</strong> (mean=0, std=1) memastikan setiap fitur berkontribusi setara dalam perhitungan jarak.</p>
+    </div>
+  </div>
+
+  <div class="table-wrap" style="margin-top:1.2rem">
+    <table>
+      <thead><tr>
+        <th>Kolom</th><th>Jumlah Missing</th><th>Persentase</th><th>Penanganan</th>
+      </tr></thead>
+      <tbody>
+        <tr><td><strong>MINIMUM_PAYMENTS</strong></td><td>313</td><td>3.50%</td><td>Imputasi Median</td></tr>
+        <tr><td><strong>CREDIT_LIMIT</strong></td><td>1</td><td>0.01%</td><td>Imputasi Median</td></tr>
+        <tr><td>Semua kolom lain (15 fitur)</td><td>0</td><td>0%</td><td>Tidak perlu</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- METODOLOGI ───────────────────────────────────────────────────────── -->
+<section id="metodologi" class="fade-section">
+  <div class="section-title">🔬 Alur Metodologi</div>
+  <div class="flow" id="flow-steps"></div>
+</section>
+
+<!-- PERBANDINGAN ─────────────────────────────────────────────────────── -->
+<section id="tabel" class="fade-section">
+  <div class="section-title">📋 Perbandingan K-Means vs DBSCAN</div>
+  <div id="winner-container"></div>
+  <div class="table-wrap">
+    <table>
+      <thead id="tabel-head"></thead>
+      <tbody id="tabel-body"></tbody>
+    </table>
+  </div>
+
+  <div class="explain-box highlight" style="margin-top:1.5rem">
+    <h4>💡 Mengapa Silhouette K-Means Hanya 0.2466?</h4>
+    <p>Silhouette Score 0.2466 menandakan cluster K-Means berada di zona <em>lemah tapi valid</em>. Nilai ini bukan kegagalan — untuk dataset keuangan high-dimensional dengan 17 fitur, nilai di atas 0.2 sudah menunjukkan adanya struktur cluster yang nyata. Banyak studi akademik dengan dataset serupa melaporkan Silhouette Score dalam rentang 0.15–0.35.</p>
+    <p>Penyebab utamanya adalah sifat data kredit yang tumpang tindih secara alami. Nasabah "Aktif Moderat" dan "Revolving" sering memiliki karakteristik yang mirip di beberapa dimensi. K-Means memaksanya masuk ke satu cluster padahal batasnya tidak tegas. PCA yang menangkap 47.61% varians juga menyebabkan sebagian informasi pembeda hilang dalam proyeksi 2D.</p>
+    <p>Meski Silhouette rendah, hasil K-Means tetap bermakna bisnis. Davies-Bouldin Score 1.592 menunjukkan cluster masih cukup terpisah. Cluster 2 (Revolving) memiliki cash advance rata-rata lebih dari 8x lebih tinggi dari Cluster 1 (Aktif Moderat) — perbedaan yang sangat signifikan secara bisnis.</p>
+  </div>
+
+  <div class="guide-table-wrap">
+    <h4>📌 Panduan Pemilihan Algoritma untuk Kasus Serupa</h4>
     <div class="table-wrap">
       <table>
-        <thead id="tabel-head"></thead>
-        <tbody id="tabel-body"></tbody>
+        <thead><tr>
+          <th>Kondisi Dataset</th><th>Rekomendasi</th><th>Alasan</th><th>Contoh Kasus</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>Data dengan outlier alami</td><td><span class="guide-badge db">DBSCAN</span></td><td>Noise handling otomatis</td><td>Deteksi fraud perbankan</td></tr>
+          <tr><td>Butuh N cluster yang pasti</td><td><span class="guide-badge km">K-Means</span></td><td>Output deterministik, mudah diinterpretasi</td><td>Segmentasi marketing</td></tr>
+          <tr><td>Bentuk cluster tidak bulat</td><td><span class="guide-badge db">DBSCAN</span></td><td>Density-based, shape agnostik</td><td>Pola geografi pelanggan</td></tr>
+          <tr><td>Dataset sangat besar (>100k)</td><td><span class="guide-badge km">K-Means</span></td><td>Kompleksitas O(n·k·i) lebih rendah</td><td>Big data analytics</td></tr>
+          <tr><td>Eksplorasi tanpa prior knowledge</td><td><span class="guide-badge db">DBSCAN</span></td><td>Tidak perlu tentukan K terlebih dahulu</td><td>Research & discovery awal</td></tr>
+        </tbody>
       </table>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ALGORITMA CARDS -->
-  <section id="algoritma">
-    <div class="section-title">⚙️ Detail Algoritma</div>
-    <div class="algo-grid" id="algo-grid"></div>
-  </section>
+<!-- DETAIL ALGORITMA ─────────────────────────────────────────────────── -->
+<section id="algoritma" class="fade-section">
+  <div class="section-title">⚙️ Detail Algoritma</div>
+  <div class="algo-grid" id="algo-grid"></div>
+</section>
 
-  <!-- SCATTER PLOT -->
-  <section id="scatter">
-    <div class="section-title">🎯 Scatter Plot PCA 2D</div>
-    <div class="chart-wrap">
-      <canvas id="scatter-chart"></canvas>
-      <p id="chart-status"></p>
+<!-- SCATTER PLOT ─────────────────────────────────────────────────────── -->
+<section id="scatter" class="fade-section">
+  <div class="section-title">🎯 Scatter Plot PCA 2D</div>
+  <div class="chart-wrap">
+    <div class="scatter-skeleton" id="scatter-skeleton">
+      <div class="skeleton-shimmer"></div>
+      <p class="skeleton-text"><span class="spin"></span>Memuat 8.950 data nasabah...</p>
     </div>
-  </section>
+    <canvas id="scatter-chart"></canvas>
+    <p id="chart-status"></p>
+  </div>
+</section>
 
-  <!-- INTERPRETASI BISNIS -->
-  <section id="interpretasi">
-    <div class="section-title">💡 Interpretasi Bisnis</div>
-    <div class="interp-grid" id="interp-grid"></div>
-  </section>
+<!-- INTERPRETASI BISNIS ─────────────────────────────────────────────── -->
+<section id="interpretasi" class="fade-section">
+  <div class="section-title">💡 Interpretasi Bisnis</div>
+  <div class="interp-grid" id="interp-grid"></div>
+</section>
 
-  <!-- GALLERY -->
-  <section id="gallery">
-    <div class="section-title">🖼️ Grafik &amp; Visualisasi</div>
-    <div class="gallery-grid" id="gallery-grid"></div>
-  </section>
+<!-- GALLERY ─────────────────────────────────────────────────────────── -->
+<section id="gallery" class="fade-section">
+  <div class="section-title">🖼️ Grafik &amp; Visualisasi (11 Plot)</div>
+  <div class="gallery-grid" id="gallery-grid"></div>
+</section>
 
-  <!-- PREDIKSI -->
-  <section id="prediksi">
-    <div class="section-title">🔮 Prediksi Cluster Nasabah</div>
-    <div class="predict-card">
-      <p style="font-size:.88rem;color:var(--muted);margin-bottom:1.2rem">Masukkan data nasabah untuk memprediksi segmen menggunakan K-Means dan DBSCAN.</p>
-      <form id="predict-form">
-        <div class="form-grid" id="predict-fields"></div>
-        <button type="submit" class="btn-predict" id="predict-btn">
-          <span id="predict-btn-spin" style="display:none" class="spin"></span>
-          🔍 Prediksi Cluster
-        </button>
-      </form>
-      <div class="result-box" id="result-box">
-        <strong>Hasil Prediksi:</strong>
-        <div class="result-grid" id="result-grid"></div>
+<!-- KESIMPULAN ───────────────────────────────────────────────────────── -->
+<section id="kesimpulan" class="fade-section">
+  <div class="section-title">📋 Kesimpulan &amp; Diskusi Ilmiah</div>
+  <div class="conclusion-grid">
+    <div class="conclusion-cards">
+      <div class="conclusion-card" style="border-top-color:var(--navy)">
+        <h4 style="color:var(--navy)">🔬 Jawaban atas Pertanyaan Penelitian</h4>
+        <p>Penelitian ini berhasil menjawab pertanyaan utama: algoritma mana yang lebih efektif untuk segmentasi nasabah kartu kredit? <strong>DBSCAN terbukti unggul</strong> dengan Silhouette Score 0.7208 dibanding K-Means 0.2466. Keunggulan ini konsisten dengan karakteristik dataset yang mengandung outlier alami (0.55% nasabah anomali) dan cluster berbentuk non-spherical yang tidak sesuai asumsi K-Means.</p>
       </div>
-    </div>
-  </section>
-
-  <!-- KESIMPULAN -->
-  <section id="kesimpulan">
-    <div class="section-title">📋 Kesimpulan Penelitian</div>
-    <div class="conclusion-grid">
-      <div class="conclusion-card" style="border-left-color:var(--navy)">
-        <h4 style="color:var(--navy)">🔬 Temuan Utama</h4>
-        <p>DBSCAN terbukti lebih unggul untuk dataset Credit Card ini. Silhouette Score DBSCAN 0.7208 berbanding K-Means 0.2466 — hampir 3 kali lipat lebih baik. Ini disebabkan distribusi data nasabah yang tidak membentuk cluster bulat simetris, melainkan cluster dengan kepadatan berbeda yang hanya bisa ditangkap DBSCAN.</p>
+      <div class="conclusion-card" style="border-top-color:var(--green2)">
+        <h4 style="color:var(--green2)">💼 Implikasi Praktis untuk Industri Perbankan</h4>
+        <p>Tiga segmen K-Means memberikan framework yang dapat langsung diimplementasikan: <strong>(1)</strong> Program reaktivasi untuk 1.275 Nasabah Pasif, <strong>(2)</strong> Program loyalty upgrade untuk 6.114 Nasabah Aktif Moderat, <strong>(3)</strong> Program restrukturisasi untuk 1.561 Nasabah Revolving. DBSCAN menambahkan lapisan perlindungan melalui identifikasi 49 nasabah anomali berisiko tinggi untuk priority review tim risk.</p>
       </div>
-      <div class="conclusion-card" style="border-left-color:var(--green2)">
-        <h4 style="color:var(--green2)">💼 Nilai Bisnis</h4>
-        <p>49 nasabah outlier yang ditemukan DBSCAN adalah nasabah dengan perilaku finansial ekstrem yang membutuhkan perhatian khusus bank. 3 segmen K-Means memberikan peta jalan pemasaran yang jelas: aktivasi nasabah pasif, upselling nasabah aktif, restrukturisasi nasabah revolving.</p>
+      <div class="conclusion-card" style="border-top-color:var(--orange)">
+        <h4 style="color:var(--orange)">⚠️ Keterbatasan Penelitian</h4>
+        <p>Terdapat keterbatasan yang perlu diakui: <strong>Pertama</strong>, PCA hanya merepresentasikan 47.61% varians — lebih dari setengah informasi tidak terlihat dalam visualisasi 2D. <strong>Kedua</strong>, data tidak mengandung dimensi temporal sehingga perubahan perilaku nasabah sepanjang waktu tidak tertangkap. <strong>Ketiga</strong>, validasi eksternal dengan ground truth tidak dilakukan karena ini adalah unsupervised learning.</p>
       </div>
-      <div class="conclusion-card" style="border-left-color:var(--orange)">
-        <h4 style="color:var(--orange)">⚠️ Keterbatasan</h4>
-        <p>PCA hanya merepresentasikan 47.61% varians data dalam 2 dimensi. Ini berarti 52.39% informasi tidak terlihat di scatter plot. K-Means tetap relevan untuk kebutuhan segmentasi sederhana yang membutuhkan interpretasi mudah dan kecepatan komputasi tinggi.</p>
-      </div>
-      <div class="conclusion-card" style="border-left-color:var(--purple)">
-        <h4 style="color:var(--purple)">🚀 Rekomendasi Lanjutan</h4>
-        <p>Penelitian berikutnya dapat mencoba HDBSCAN untuk parameter yang lebih adaptif, menambahkan data temporal histori transaksi, dan membandingkan dengan Gaussian Mixture Model. Deployment API prediksi real-time juga dapat diperkuat dengan model ensemble.</p>
+      <div class="conclusion-card" style="border-top-color:var(--purple)">
+        <h4 style="color:var(--purple)">🚀 Rekomendasi Penelitian Lanjutan</h4>
+        <p>Untuk hasil yang lebih baik: <strong>(1)</strong> Coba HDBSCAN yang lebih adaptif terhadap variasi densitas, <strong>(2)</strong> Tambahkan data temporal histori 12 bulan per nasabah, <strong>(3)</strong> Bandingkan dengan Gaussian Mixture Model yang lebih fleksibel dalam menangani cluster overlap, <strong>(4)</strong> Gunakan t-SNE atau UMAP sebagai alternatif PCA yang preservasi struktur lokal lebih baik.</p>
       </div>
     </div>
-  </section>
+    <div class="summary-box">
+      <h4>📊 Ringkasan Hasil Akhir</h4>
+      <div class="summary-metric"><span>K-Means (K=3)</span><span class="sm-val">Sil. 0.2466</span></div>
+      <div class="summary-metric"><span>K-Means DB Score</span><span class="sm-val">1.5920</span></div>
+      <div class="summary-metric"><span>DBSCAN (eps=5.41)</span><span class="sm-val">Sil. 0.7208</span></div>
+      <div class="summary-metric"><span>DBSCAN Noise</span><span class="sm-val">49 (0.55%)</span></div>
+      <div class="summary-metric"><span>PCA Variance</span><span class="sm-val">47.61%</span></div>
+      <div class="summary-metric"><span>Dataset</span><span class="sm-val">8.950 baris</span></div>
+      <div class="winner-metric">🏆 DBSCAN Menang &nbsp;|&nbsp; 2.93× lebih baik</div>
 
-  <!-- UNDUHAN -->
-  <section id="unduhan">
-    <div class="section-title">⬇️ Unduhan</div>
-    <div class="download-section" id="download-links"></div>
-  </section>
+      <div class="ref-list">
+        <h5>📚 Referensi Akademik Primer</h5>
+        <div class="ref-item"><em>MacQueen, J. (1967).</em> Some Methods for Classification and Analysis of Multivariate Observations. Proc. 5th Berkeley Symp.</div>
+        <div class="ref-item"><em>Ester, M. et al. (1996).</em> DBSCAN: A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases. KDD-96.</div>
+        <div class="ref-item"><em>Rousseeuw, P.J. (1987).</em> Silhouettes: A Graphical Aid to the Interpretation and Validation of Cluster Analysis. JCAM.</div>
+        <div class="ref-item"><em>Davies, D.L. &amp; Bouldin, D.W. (1979).</em> A Cluster Separation Measure. IEEE Trans. PAMI.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PREDIKSI ─────────────────────────────────────────────────────────── -->
+<section id="prediksi" class="fade-section">
+  <div class="section-title">🔮 Prediksi Cluster Nasabah</div>
+  <div class="predict-card">
+    <p style="font-size:.88rem;color:var(--muted);margin-bottom:1.2rem">Masukkan data nasabah untuk memprediksi segmen, risk score, dan rekomendasi tindakan.</p>
+    <form id="predict-form">
+      <div class="form-grid" id="predict-fields"></div>
+      <button type="submit" class="btn-predict" id="predict-btn">
+        <span id="predict-btn-spin" style="display:none" class="spin"></span>
+        🔍 Prediksi &amp; Analisis Risiko
+      </button>
+    </form>
+    <div class="result-box" id="result-box">
+      <strong>Hasil Prediksi &amp; Analisis:</strong>
+      <div class="result-top" id="result-grid"></div>
+      <div class="result-bottom">
+        <div class="risk-box" id="risk-box"></div>
+        <div class="mini-scatter-box">
+          <div class="ms-title">Posisi Anda dalam Ruang PCA</div>
+          <canvas id="mini-scatter-chart"></canvas>
+          <p style="font-size:.72rem;color:var(--muted);margin-top:.3rem" id="mini-scatter-note">Titik merah = posisi prediksi Anda</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- UNDUHAN ──────────────────────────────────────────────────────────── -->
+<section id="unduhan" class="fade-section">
+  <div class="section-title">⬇️ Unduhan</div>
+  <div class="download-section" id="download-links"></div>
+</section>
 
 </main>
 
@@ -305,6 +496,8 @@ footer p{margin:.2rem 0}
   <span class="lb-caption" id="lb-caption"></span>
 </div>
 
+<button id="back-top" aria-label="Kembali ke atas">↑<span>TOP</span></button>
+
 <footer>
   <p><strong>Project 3 Machine Learning — Kelompok B</strong></p>
   <p>Brad &bull; Annaliese &bull; Vincentius &bull; Mike</p>
@@ -313,163 +506,168 @@ footer p{margin:.2rem 0}
 </footer>
 
 <script>
-// ─── CONSTANTS ────────────────────────────────────────────────────────────────
+// ═══ CONSTANTS ════════════════════════════════════════════════════════════════
 const META = {
-  jumlah_baris: 8950,
-  jumlah_fitur: 17,
-  pca_variance: 47.61,
-  kmeans: {
-    k: 3,
-    silhouette: 0.2466,
-    davies_bouldin: 1.5920,
-    inertia: 111975.04,
-    distribusi: { "Cluster 0 (Nasabah Pasif)": 1275, "Cluster 1 (Aktif Moderat)": 6114, "Cluster 2 (Revolving/Berisiko)": 1561 }
-  },
-  dbscan: {
-    eps: 5.4131,
-    min_samples: 5,
-    n_cluster: 2,
-    noise: 49,
-    pct_noise: 0.55,
-    silhouette: 0.7208
-  },
-  pemenang: "DBSCAN",
-  alasan: "DBSCAN memiliki Silhouette Score 0.7208 — hampir 3x lebih baik dari K-Means 0.2466, dan berhasil mendeteksi 49 outlier/nasabah anomali secara otomatis"
+  jumlah_baris:8950, jumlah_fitur:17, pca_variance:47.61,
+  kmeans:{ k:3, silhouette:0.2466, davies_bouldin:1.5920, inertia:111975.04,
+    distribusi:{"Cluster 0 (Nasabah Pasif)":1275,"Cluster 1 (Aktif Moderat)":6114,"Cluster 2 (Revolving/Berisiko)":1561}},
+  dbscan:{ eps:5.4131, min_samples:5, n_cluster:2, noise:49, pct_noise:0.55, silhouette:0.7208 },
+  pemenang:"DBSCAN",
+  alasan:"DBSCAN memiliki Silhouette Score 0.7208 — hampir 3x lebih baik dari K-Means 0.2466, dan mendeteksi 49 outlier anomali secara otomatis"
+};
+
+const STATS_TABLE = [
+  { f:"BALANCE",          min:0,    max:19043, mean:1564.47, std:2081.42 },
+  { f:"PURCHASES",        min:0,    max:49040, mean:1003.20, std:2136.52 },
+  { f:"CASH_ADVANCE",     min:0,    max:47137, mean:978.87,  std:2097.05 },
+  { f:"CREDIT_LIMIT",     min:50,   max:30000, mean:4494.28, std:3638.44 },
+  { f:"PAYMENTS",         min:0,    max:50721, mean:1733.14, std:2894.90 },
+  { f:"MINIMUM_PAYMENTS", min:0,    max:76406, mean:844.91,  std:2332.66 },
+  { f:"PRC_FULL_PAYMENT", min:0,    max:1,     mean:0.15,    std:0.29    },
+  { f:"TENURE",           min:6,    max:12,    mean:11.52,   std:1.34    }
+];
+
+// Actual cluster mini-bar % (normalized to global max per feature)
+const CLUSTER_MINI = {
+  0: { BALANCE:11.5, PURCHASES:8.5, CASH_ADVANCE:1.0,  PRC_FULL_PAYMENT:29.9 },
+  1: { BALANCE:4.2,  PURCHASES:1.0, CASH_ADVANCE:0.7,  PRC_FULL_PAYMENT:15.4 },
+  2: { BALANCE:21.1, PURCHASES:0.8, CASH_ADVANCE:8.3,  PRC_FULL_PAYMENT:3.4  }
+};
+
+// Outlier stats (49 noise points vs all)
+const OUTLIER_STATS = {
+  CASH_ADVANCE:      { noise:5545.8,  all:978.9,  ratio:5.7  },
+  BALANCE:           { noise:6578.2,  all:1564.5, ratio:4.2  },
+  MINIMUM_PAYMENTS:  { noise:10820.0, all:844.9,  ratio:12.8 },
+  PRC_FULL_PAYMENT:  { noise:0.3,     all:0.2,    ratio:2.2  }
 };
 
 const INTERPRETASI = [
-  {
-    judul: "Cluster 0 — Nasabah Pasif",
-    tag: "PASIF",
-    warna: "#1565c0",
-    bg: "#e3f2fd",
-    desc: "Nasabah dengan saldo rendah, jarang bertransaksi, dan hampir tidak menggunakan fasilitas cash advance. Segmen ini berpotensi diaktifkan kembali melalui program reward dan penawaran promo menarik."
-  },
-  {
-    judul: "Cluster 1 — Nasabah Aktif Moderat",
-    tag: "MODERAT",
-    warna: "#2e7d32",
-    bg: "#e8f5e9",
-    desc: "Nasabah dengan frekuensi transaksi sedang dan penggunaan kartu yang konsisten. Merupakan segmen terbesar (6.114 nasabah). Strategi: pertahankan loyalitas dengan program cashback."
-  },
-  {
-    judul: "Cluster 2 — Nasabah Revolving/Berisiko",
-    tag: "BERISIKO",
-    warna: "#b71c1c",
-    bg: "#ffebee",
-    desc: "Nasabah dengan penggunaan cash advance tinggi dan pembayaran minimum rendah. Potensi gagal bayar lebih tinggi. Strategi: monitoring kredit ketat, edukasi keuangan, dan penawaran program restrukturisasi."
-  },
-  {
-    judul: "DBSCAN — Cluster Otomatis",
-    tag: "DBSCAN",
-    warna: "#6a1b9a",
-    bg: "#f3e5f5",
-    desc: "DBSCAN menemukan 2 cluster padat tanpa perlu menentukan K terlebih dahulu. Algoritma ini unggul dalam mendeteksi pola non-konveks dan outlier secara alami."
-  },
-  {
-    judul: "49 Outlier Terdeteksi",
-    tag: "ANOMALI",
-    warna: "#e65100",
-    bg: "#fff3e0",
-    desc: "0.55% nasabah (49 orang) diidentifikasi sebagai outlier oleh DBSCAN — perilaku finansial sangat tidak biasa. Nasabah ini perlu investigasi individual oleh tim manajemen risiko."
-  },
-  {
-    judul: "PCA — Reduksi Dimensi",
-    tag: "PCA",
-    warna: "#1a237e",
-    bg: "#e8eaf6",
-    desc: "Principal Component Analysis merangkum 17 fitur menjadi 2 komponen utama dengan total variance 47.61%. PC1 menangkap pola penggunaan umum, PC2 menangkap perilaku pembayaran."
-  }
+  { judul:"Cluster 0 — Nasabah Pasif", tag:"PASIF", warna:"#1565c0", bg:"#e3f2fd", cluster:0,
+    desc:"Nasabah dengan saldo rendah dan penggunaan kartu tidak konsisten. Meski kadang melakukan pembelian besar, aktivitas keseluruhan rendah. Potensi diaktifkan kembali melalui program reward dan penawaran promo menarik." },
+  { judul:"Cluster 1 — Nasabah Aktif Moderat", tag:"MODERAT", warna:"#2e7d32", bg:"#e8f5e9", cluster:1,
+    desc:"Nasabah dengan aktivitas paling rendah secara rata-rata tapi paling banyak (6.114 nasabah). Merupakan segmen terbesar. Strategi: pertahankan loyalitas dengan program cashback dan upgrade limit kredit bertahap." },
+  { judul:"Cluster 2 — Nasabah Revolving/Berisiko", tag:"BERISIKO", warna:"#b71c1c", bg:"#ffebee", cluster:2,
+    desc:"Nasabah dengan penggunaan cash advance tinggi, saldo besar, dan pembayaran minimum rendah. Potensi gagal bayar lebih tinggi. Strategi: monitoring ketat, edukasi keuangan, dan penawaran restrukturisasi." },
+  { judul:"DBSCAN — Cluster Otomatis", tag:"DBSCAN", warna:"#6a1b9a", bg:"#f3e5f5", cluster:null,
+    desc:"DBSCAN menemukan 2 cluster padat tanpa perlu menentukan K terlebih dahulu. Algoritma ini unggul dalam mendeteksi pola non-konveks dan outlier secara alami — cocok untuk data finansial yang kompleks." },
+  { judul:"49 Outlier Terdeteksi", tag:"ANOMALI", warna:"#e65100", bg:"#fff3e0", cluster:-1,
+    desc:"DBSCAN mengisolasi 49 nasabah (0.55%) sebagai outlier berprofil ekstrem: Purchases 16.7×, Payments 12.4×, Cash Advance 5.7×, dan Balance 4.2× lebih tinggi dari rata-rata. Ini adalah nasabah 'whale' — nilai transaksi sangat besar — yang butuh PRIORITY REVIEW karena pola tidak cocok segmen manapun." },
+  { judul:"PCA — Reduksi Dimensi", tag:"PCA", warna:"#1a237e", bg:"#e8eaf6", cluster:null,
+    desc:"17 fitur dikompres menjadi 2 komponen dengan variance 47.61%. PC1 menangkap pola penggunaan umum (balance, purchases), PC2 menangkap perilaku pembayaran. Memungkinkan visualisasi cluster dalam 2D." }
 ];
 
 const GALLERIES = [
-  { src: "/reports/01_distribusi_fitur.png",   caption: "01 Distribusi Fitur" },
-  { src: "/reports/02_correlation_heatmap.png", caption: "02 Correlation Heatmap" },
-  { src: "/reports/03_elbow_method.png",        caption: "03 Elbow Method K-Means" },
-  { src: "/reports/04_silhouette_score.png",    caption: "04 Silhouette Score K-Means" },
-  { src: "/reports/05_kdistance_dbscan.png",    caption: "05 K-Distance DBSCAN" },
-  { src: "/reports/06_kmeans_scatter.png",      caption: "06 K-Means Scatter PCA" },
-  { src: "/reports/07_dbscan_scatter.png",      caption: "07 DBSCAN Scatter PCA" },
-  { src: "/reports/08_cluster_profiles.png",    caption: "08 Cluster Profiles" },
-  { src: "/reports/09_feature_importance.png",  caption: "09 Feature Importance" },
-  { src: "/reports/10_comparison_chart.png",    caption: "10 Perbandingan Algoritma" },
-  { src: "/reports/11_pca_variance.png",        caption: "11 PCA Variance Explained" }
+  { src:"/reports/01_distribusi_fitur.png",    caption:"01 Distribusi Fitur" },
+  { src:"/reports/02_correlation_heatmap.png", caption:"02 Correlation Heatmap" },
+  { src:"/reports/03_elbow_method.png",        caption:"03 Elbow Method K-Means" },
+  { src:"/reports/04_silhouette_score.png",    caption:"04 Silhouette Score K-Means" },
+  { src:"/reports/05_kdistance_dbscan.png",    caption:"05 K-Distance DBSCAN" },
+  { src:"/reports/06_kmeans_scatter.png",      caption:"06 K-Means Scatter PCA" },
+  { src:"/reports/07_dbscan_scatter.png",      caption:"07 DBSCAN Scatter PCA" },
+  { src:"/reports/08_cluster_profiles.png",    caption:"08 Radar Profil Cluster" },
+  { src:"/reports/09_feature_importance.png",  caption:"09 Feature Importance" },
+  { src:"/reports/10_comparison_chart.png",    caption:"10 Perbandingan Komprehensif" },
+  { src:"/reports/11_pca_variance.png",        caption:"11 PCA Variance Explained" }
 ];
 
 const TABEL_ROWS = [
-  { metrik: "Jumlah Cluster",   km: "3",       db: "2",      win: "db" },
-  { metrik: "Silhouette Score", km: "0.2466",  db: "0.7208", win: "db" },
-  { metrik: "Davies-Bouldin",   km: "1.5920",  db: "N/A",    win: "km" },
-  { metrik: "Inertia",          km: "111,975", db: "N/A",    win: "km" },
-  { metrik: "Data Noise",       km: "0%",      db: "0.55% (49 nasabah)", win: "db" },
-  { metrik: "Perlu Tentukan K", km: "Ya",      db: "Tidak",  win: "db" },
-  { metrik: "Deteksi Outlier",  km: "Tidak",   db: "Ya (otomatis)", win: "db" },
-  { metrik: "PCA Variance",     km: "47.61%",  db: "47.61%", win: "tie" }
+  { metrik:"Jumlah Cluster",      km:"3",       db:"2",                      win:"db" },
+  { metrik:"Silhouette Score",    km:"0.2466",  db:"0.7208",                  win:"db" },
+  { metrik:"Davies-Bouldin",      km:"1.5920",  db:"N/A",                     win:"km" },
+  { metrik:"Inertia",             km:"111,975", db:"N/A",                     win:"km" },
+  { metrik:"Data Noise",          km:"0%",      db:"0.55% (49 nasabah)",      win:"db" },
+  { metrik:"Perlu Tentukan K",    km:"Ya",      db:"Tidak",                   win:"db" },
+  { metrik:"Deteksi Outlier",     km:"Tidak",   db:"Ya (otomatis)",           win:"db" },
+  { metrik:"Bentuk Cluster",      km:"Spherical", db:"Arbitrary shape",       win:"db" },
+  { metrik:"PCA Variance (PC1+2)",km:"47.61%",  db:"47.61%",                  win:"tie" }
 ];
 
 const PREDICT_FIELDS = [
-  { id: "BALANCE",         label: "Saldo (BALANCE)",        placeholder: "cth: 1500", def: "1500" },
-  { id: "PURCHASES",       label: "Pembelian (PURCHASES)",  placeholder: "cth: 2000", def: "2000" },
-  { id: "CASH_ADVANCE",    label: "Cash Advance",           placeholder: "cth: 0",    def: "0"    },
-  { id: "CREDIT_LIMIT",    label: "Limit Kredit",           placeholder: "cth: 5000", def: "5000" },
-  { id: "PRC_FULL_PAYMENT",label: "% Bayar Penuh (0-1)",    placeholder: "cth: 0.5",  def: "0.5"  },
-  { id: "TENURE",          label: "Lama Menjadi Nasabah",   placeholder: "cth: 12",   def: "12"   }
+  { id:"BALANCE",          label:"Saldo (BALANCE)",          def:"1500", step:"any" },
+  { id:"PURCHASES",        label:"Pembelian (PURCHASES)",    def:"2000", step:"any" },
+  { id:"CASH_ADVANCE",     label:"Cash Advance",             def:"0",    step:"any" },
+  { id:"CREDIT_LIMIT",     label:"Limit Kredit",             def:"5000", step:"any" },
+  { id:"PRC_FULL_PAYMENT", label:"% Bayar Penuh (0–1)",      def:"0.5",  step:"0.01" },
+  { id:"TENURE",           label:"Lama Nasabah (bulan)",     def:"12",   step:"1" }
 ];
+
+const RISK_MAP = {
+  0:  { score:"RENDAH",       color:"#2e7d32", bg:"#e8f5e9", icon:"✓",
+        recs:["Program cashback untuk meningkatkan aktivitas belanja","Tawarkan produk tabungan dan investasi berbunga menarik","Kirim email promosi bulanan dengan penawaran spesial"] },
+  1:  { score:"SEDANG",       color:"#f57c00", bg:"#fff3e0", icon:"~",
+        recs:["Tingkatkan limit kredit berdasarkan histori pembayaran","Tawarkan program loyalty poin reward","Rekomendasikan upgrade ke kartu premium"] },
+  2:  { score:"TINGGI",       color:"#b71c1c", bg:"#ffebee", icon:"⚠",
+        recs:["Monitor aktivitas cash advance secara rutin","Hubungi nasabah untuk konsultasi restrukturisasi utang","Pertimbangkan evaluasi limit kredit"] },
+  '-1':{ score:"SANGAT TINGGI",color:"#4a148c",bg:"#f3e5f5", icon:"✗",
+        recs:["Prioritas review oleh tim risk management","Lakukan verifikasi identitas dan audit transaksi","Pertimbangkan pembekuan sementara fasilitas kredit"] }
+};
 
 const DOWNLOAD_FILES = [
-  { label: "📊 Hasil Clustering CSV",    href: "/data/hasil_clustering.csv" },
-  { label: "📈 PCA Result CSV",          href: "/data/pca_result.csv" },
-  { label: "📄 Metadata JSON",           href: "/models/metadata.json" },
-  { label: "📝 Interpretasi Bisnis",     href: "/reports/interpretasi_bisnis.txt" },
-  { label: "📋 Tabel Perbandingan",      href: "/reports/tabel_perbandingan.txt" }
+  { label:"📊 Hasil Clustering CSV", href:"/data/hasil_clustering.csv" },
+  { label:"📈 PCA Result CSV",       href:"/data/pca_result.csv" },
+  { label:"📄 Metadata JSON",        href:"/models/metadata.json" },
+  { label:"📝 Interpretasi Bisnis",  href:"/reports/interpretasi_bisnis.txt" },
+  { label:"📋 Tabel Perbandingan",   href:"/reports/tabel_perbandingan.txt" }
 ];
 
-// ─── INIT FUNCTIONS ────────────────────────────────────────────────────────────
+// ═══ MODULE STATE ══════════════════════════════════════════════════════════════
+let _pcaData = [];           // sampled PCA data for mini scatter
+let _miniScatterChart = null;
+let _countersDone = false;
 
+// ═══ initStats ════════════════════════════════════════════════════════════════
 function initStats() {
   const cards = [
-    { val: "8,950",         lbl: "Total Nasabah",     sub: "CC GENERAL dataset",          color: "var(--navy)" },
-    { val: "17",            lbl: "Fitur Perilaku",    sub: "Finansial nasabah",            color: "var(--green2)" },
-    { val: "0.7208",        lbl: "Silhouette DBSCAN", sub: "vs K-Means 0.2466",            color: "var(--red)" },
-    { val: "49",            lbl: "Outlier Terdeteksi",sub: "DBSCAN (0.55% data)",          color: "var(--orange)" }
+    { val:8950,   disp:"8,950",  lbl:"Total Nasabah",     sub:"CC GENERAL dataset",   decimals:0 },
+    { val:17,     disp:"17",     lbl:"Fitur Perilaku",    sub:"Finansial nasabah",    decimals:0 },
+    { val:0.7208, disp:"0.7208", lbl:"Silhouette DBSCAN", sub:"vs K-Means 0.2466",   decimals:4 },
+    { val:49,     disp:"49",     lbl:"Outlier Terdeteksi",sub:"DBSCAN (0.55% data)", decimals:0 }
   ];
-  document.getElementById('stat-grid').innerHTML = cards.map(c =>
+  const grid = document.getElementById('stat-grid');
+  grid.innerHTML = cards.map((c,i) =>
     `<div class="stat-card">
-      <div class="val">${c.val}</div>
+      <div class="val" data-target="${c.val}" data-decimals="${c.decimals}">${c.disp}</div>
       <div class="lbl">${c.lbl}</div>
       <div class="sub-lbl">${c.sub}</div>
     </div>`
   ).join('');
 }
 
-function initTabel() {
-  document.getElementById('winner-container').innerHTML =
-    `<div class="winner-banner">
-      <div class="winner-trophy">🏆</div>
-      <div>
-        <h2>Pemenang: DBSCAN</h2>
-        <p>${META.alasan}</p>
-      </div>
-    </div>`;
-
-  document.getElementById('tabel-head').innerHTML =
-    `<tr>
-      <th>Metrik</th>
-      <th class="col-km">K-Means</th>
-      <th class="col-db">DBSCAN</th>
-    </tr>`;
-
-  document.getElementById('tabel-body').innerHTML = TABEL_ROWS.map(r => {
-    const kmClass = r.win === 'km' ? ' class="win-cell"' : '';
-    const dbClass = r.win === 'db' ? ' class="win-cell"' : '';
-    return `<tr>
-      <td><strong>${r.metrik}</strong></td>
-      <td${kmClass}>${r.km}</td>
-      <td${dbClass}>${r.db}</td>
+// ═══ initStatsDescript ════════════════════════════════════════════════════════
+function initStatistikDeskriptif() {
+  const fmtN = v => v.toLocaleString('id-ID', {minimumFractionDigits:0,maximumFractionDigits:2});
+  document.getElementById('stats-table-body').innerHTML = STATS_TABLE.map(r => {
+    const skewed = r.std > r.mean;
+    const tr = skewed ? ' class="hi-std"' : '';
+    return `<tr${tr}>
+      <td><strong>${r.f}</strong></td>
+      <td>${fmtN(r.min)}</td>
+      <td>${fmtN(r.max)}</td>
+      <td>${fmtN(r.mean)}</td>
+      <td>${fmtN(r.std)}${skewed ? ' ⚠' : ''}</td>
+      <td style="font-size:.75rem;color:var(--muted)">${skewed ? 'Skewed kanan' : 'Relatif normal'}</td>
     </tr>`;
   }).join('');
 }
 
+// ═══ initTabel ════════════════════════════════════════════════════════════════
+function initTabel() {
+  document.getElementById('winner-container').innerHTML =
+    `<div class="winner-banner">
+      <div class="winner-trophy">🏆</div>
+      <div><h2>Pemenang: DBSCAN</h2><p>${META.alasan}</p></div>
+    </div>`;
+  document.getElementById('tabel-head').innerHTML =
+    `<tr><th>Metrik</th><th class="col-km">K-Means</th><th class="col-db">DBSCAN</th></tr>`;
+  document.getElementById('tabel-body').innerHTML = TABEL_ROWS.map(r => {
+    const kc = r.win==='km' ? ' class="win-cell"' : '';
+    const dc = r.win==='db' ? ' class="win-cell"' : '';
+    return `<tr><td><strong>${r.metrik}</strong></td><td${kc}>${r.km}</td><td${dc}>${r.db}</td></tr>`;
+  }).join('');
+}
+
+// ═══ initAlgo ═════════════════════════════════════════════════════════════════
 function initAlgo() {
   document.getElementById('algo-grid').innerHTML =
     `<div class="algo-card km">
@@ -483,54 +681,82 @@ function initAlgo() {
       <div class="algo-metric"><span>Cluster 2 (Berisiko)</span><span class="mval">1,561 nasabah</span></div>
     </div>
     <div class="algo-card db">
-      <h3>🔵 DBSCAN (eps=5.41)</h3>
+      <h3>🔵 DBSCAN (eps=5.4131)</h3>
       <div class="algo-metric"><span>Eps Optimal</span><span class="mval">5.4131</span></div>
       <div class="algo-metric"><span>Min Samples</span><span class="mval">5</span></div>
       <div class="algo-metric"><span>Jumlah Cluster</span><span class="mval">2 Cluster</span></div>
       <div class="algo-metric"><span>Silhouette Score</span><span class="mval">0.7208</span></div>
-      <div class="algo-metric"><span>Outlier / Noise</span><span class="mval">49 (0.55%)</span></div>
+      <div class="algo-metric"><span>Noise / Outlier</span><span class="mval">49 (0.55%)</span></div>
       <div class="algo-metric"><span>PCA Variance</span><span class="mval">47.61%</span></div>
       <div class="algo-metric"><span>Status</span><span class="mval" style="color:var(--green2)">✅ Pemenang</span></div>
     </div>`;
 }
 
+// ═══ initMetodologi ════════════════════════════════════════════════════════════
 function initMetodologi() {
   const steps = [
-    { icon: "📦", title: "Data Loading",   desc: "CC GENERAL.csv\n8.950 baris, 17 fitur" },
-    { icon: "🧹", title: "Preprocessing",  desc: "Drop CUST_ID, impute median, StandardScaler" },
-    { icon: "📉", title: "PCA",            desc: "Reduksi ke 2D\n47.61% variance" },
-    { icon: "📐", title: "K-Means",        desc: "Elbow + Silhouette\nK=3 optimal" },
-    { icon: "🔵", title: "DBSCAN",         desc: "K-distance graph\neps=5.41, 2 cluster" },
-    { icon: "📊", title: "Evaluasi",       desc: "Silhouette Score\nDavies-Bouldin" },
-    { icon: "🏆", title: "DBSCAN Menang",  desc: "Sil. 0.7208 >> 0.2466" }
+    { icon:"📦", title:"Data Loading",  desc:"CC GENERAL.csv\n8.950 baris, 17 fitur" },
+    { icon:"🧹", title:"Preprocessing", desc:"Imputasi median\nStandardScaler" },
+    { icon:"📉", title:"PCA",           desc:"Reduksi ke 2D\n47.61% variance" },
+    { icon:"📐", title:"K-Means",       desc:"Elbow + Silhouette\nK=3 optimal" },
+    { icon:"🔵", title:"DBSCAN",        desc:"K-distance graph\neps=5.41, 2 cluster" },
+    { icon:"📊", title:"Evaluasi",      desc:"Silhouette Score\nDavies-Bouldin" },
+    { icon:"🏆", title:"DBSCAN Menang", desc:"Sil. 0.7208 >> 0.2466" }
   ];
-  const html = steps.map((s, i) => {
-    const arrow = i < steps.length - 1 ? '<div class="flow-arrow">&#8594;</div>' : '';
-    return `<div class="flow-step">
+  document.getElementById('flow-steps').innerHTML = steps.map((s, i) =>
+    `<div class="flow-step">
       <div class="icon-box">${s.icon}</div>
       <div class="step-title">${s.title}</div>
       <div class="step-desc">${s.desc.replace('\n','<br>')}</div>
-    </div>${arrow}`;
-  }).join('');
-  document.getElementById('flow-steps').innerHTML = html;
+    </div>${i < steps.length-1 ? '<div class="flow-arrow">&#8594;</div>' : ''}`
+  ).join('');
 }
 
+// ═══ initInterpretasi ═════════════════════════════════════════════════════════
 function initInterpretasi() {
+  const MINI_LABELS = [
+    { key:'BALANCE',          label:'Balance' },
+    { key:'PURCHASES',        label:'Purchases' },
+    { key:'CASH_ADVANCE',     label:'Cash Adv.' },
+    { key:'PRC_FULL_PAYMENT', label:'Full Pay' }
+  ];
+  const KM_COLORS = ['#1565c0','#2e7d32','#b71c1c'];
+
+  function miniBarHtml(clusterIdx) {
+    if (clusterIdx === null || clusterIdx === -1) return '';
+    const data  = CLUSTER_MINI[clusterIdx];
+    const color = KM_COLORS[clusterIdx];
+    const bars  = MINI_LABELS.map(({key, label}) => {
+      const pct = data[key] || 0;
+      return `<div class="mini-bar-row">
+        <span class="mb-label">${label}</span>
+        <div class="mb-track"><div class="mb-fill" style="width:${pct}%;background:${color}"></div></div>
+        <span class="mb-pct">${pct}%</span>
+      </div>`;
+    }).join('');
+    return `<div class="mini-bar-section">
+      <div class="mb-title">Profil Fitur Utama (% dari maks global)</div>
+      ${bars}
+    </div>`;
+  }
+
   document.getElementById('interp-grid').innerHTML = INTERPRETASI.map(item =>
     `<div class="interp-card" style="border-left-color:${item.warna}">
       <span class="tag" style="background:${item.bg};color:${item.warna}">${item.tag}</span>
       <h4 style="color:${item.warna}">${item.judul}</h4>
+      ${miniBarHtml(item.cluster)}
       <p>${item.desc}</p>
     </div>`
   ).join('');
 }
 
+// ═══ initGallery + initLightbox ═══════════════════════════════════════════════
 function initGallery() {
   document.getElementById('gallery-grid').innerHTML = GALLERIES.map(g =>
     `<div class="gallery-item" data-src="${g.src}" data-caption="${g.caption}">
       <div class="img-wrap">
         <img src="${g.src}" alt="${g.caption}" loading="lazy"
-             onerror="this.style.cssText='height:100px;object-fit:none;background:linear-gradient(135deg,#e8eaf6,#c5cae9)';this.alt='';this.insertAdjacentHTML('afterend','<div style=\'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px\'><span style=\'font-size:13px;font-weight:600;color:#555;text-align:center;padding:0 8px\'>${g.src.split(\'/\').pop()}</span><span style=\'font-size:11px;color:#888\'>Jalankan ulang stage4_reports.py</span></div>')">
+             onerror="this.parentElement.style.cssText='height:100px;background:linear-gradient(135deg,#e8eaf6,#c5cae9);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px';this.style.display='none';this.parentElement.innerHTML+='<span style=\'font-size:11px;font-weight:600;color:#555;text-align:center;padding:0 6px\'>${g.src.split('/').pop()}</span><span style=\'font-size:10px;color:#888\'>Jalankan ulang stage4_reports.py</span>'">
         <div class="img-overlay">🔍</div>
       </div>
       <div class="gallery-caption">${g.caption}</div>
@@ -551,87 +777,87 @@ function initLightbox() {
   });
   document.getElementById('lb-close').addEventListener('click', () => lb.classList.remove('open'));
   lb.addEventListener('click', e => { if (e.target === lb) lb.classList.remove('open'); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') lb.classList.remove('open'); });
+  document.addEventListener('keydown', e => { if (e.key==='Escape') lb.classList.remove('open'); });
 }
 
+// ═══ initScatterPlot ══════════════════════════════════════════════════════════
 function initScatterPlot() {
-  const ctx = document.getElementById('scatter-chart').getContext('2d');
-  const status = document.getElementById('chart-status');
+  const ctx  = document.getElementById('scatter-chart').getContext('2d');
+  const skel = document.getElementById('scatter-skeleton');
+  const stat = document.getElementById('chart-status');
 
-  const KM_COLORS  = ['#1565c0','#2e7d32','#b71c1c'];
-  const KM_NAMES   = ['Cluster 0 — Pasif','Cluster 1 — Aktif Moderat','Cluster 2 — Revolving/Berisiko'];
-  const DB_COLORS  = ['#6a1b9a','#00838f','#e65100'];
+  skel.classList.add('show');
+
+  const KM_COLORS = ['#1565c0','#2e7d32','#b71c1c'];
+  const KM_NAMES  = ['Cluster 0 — Pasif','Cluster 1 — Aktif Moderat','Cluster 2 — Revolving'];
 
   function buildChart(datasets, title) {
     if (window._scatterChart) window._scatterChart.destroy();
+    skel.classList.remove('show');
     window._scatterChart = new Chart(ctx, {
-      type: 'scatter',
-      data: { datasets },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { position: 'bottom', labels: { font: { size: 12 }, padding: 16 } },
-          title:  { display: true, text: title, font: { size: 14, weight: 'bold' } },
-          tooltip: { callbacks: { label: p => `PC1: ${p.parsed.x.toFixed(2)}, PC2: ${p.parsed.y.toFixed(2)}` } }
+      type:'scatter',
+      data:{ datasets },
+      options:{
+        responsive:true,
+        plugins:{
+          legend:{ position:'bottom', labels:{ font:{size:12}, padding:16 }},
+          title:{ display:true, text:title, font:{size:14,weight:'bold'} },
+          tooltip:{ callbacks:{ label: p => `PC1:${p.parsed.x.toFixed(2)}, PC2:${p.parsed.y.toFixed(2)}` }}
         },
-        scales: {
-          x: { title: { display: true, text: 'PC1 (Principal Component 1)' } },
-          y: { title: { display: true, text: 'PC2 (Principal Component 2)' } }
+        scales:{
+          x:{ title:{ display:true, text:'PC1 (Principal Component 1)' }},
+          y:{ title:{ display:true, text:'PC2 (Principal Component 2)' }}
         }
       }
     });
   }
 
   function useDemoData() {
-    const N = 300;
-    const centers = [[-2.5, -1], [0.5, 1.5], [3, -0.5]];
-    const datasets = centers.map((c, i) => ({
+    const N=150, centers=[[-2.5,-1],[0.5,1.5],[3,-0.5]];
+    const datasets = centers.map((c,i) => ({
       label: KM_NAMES[i],
-      data: Array.from({ length: N }, () => ({
-        x: c[0] + (Math.random() - 0.5) * 3,
-        y: c[1] + (Math.random() - 0.5) * 3
-      })),
-      backgroundColor: KM_COLORS[i] + '99',
-      pointRadius: 3
+      data: Array.from({length:N}, () => ({ x:c[0]+(Math.random()-.5)*3, y:c[1]+(Math.random()-.5)*3 })),
+      backgroundColor: KM_COLORS[i]+'99', pointRadius:3
     }));
-    buildChart(datasets, 'PCA 2D — K-Means Clusters (Demo Data)');
-    status.textContent = 'Mode demo — generate scatter plot ilustratif (pca_result.csv tidak tersedia)';
+    buildChart(datasets,'PCA 2D — K-Means Clusters (Demo Data)');
+    stat.textContent = 'Mode demo — pca_result.csv tidak tersedia';
   }
 
   Papa.parse('/data/pca_result.csv', {
-    download: true,
-    header: true,
-    skipEmptyLines: true,
+    download:true, header:true, skipEmptyLines:true,
     complete(res) {
       const rows = res.data;
-      if (!rows.length || !('PC1' in rows[0]) || !('KMeans_Label' in rows[0])) {
-        useDemoData(); return;
-      }
+      if (!rows.length || !('PC1' in rows[0]) || !('KMeans_Label' in rows[0])) { useDemoData(); return; }
+      // Sample every ~9th point for performance (keep ~1000 pts)
+      const step = Math.max(1, Math.floor(rows.length / 1000));
+      const sampled = rows.filter((_,i) => i%step===0);
+      // Store for mini scatter
+      _pcaData = sampled.map(r => ({ x:parseFloat(r.PC1), y:parseFloat(r.PC2), km:parseInt(r.KMeans_Label) }));
       const byCluster = {};
-      rows.forEach(r => {
+      sampled.forEach(r => {
         const lbl = parseInt(r.KMeans_Label);
         if (!byCluster[lbl]) byCluster[lbl] = [];
-        byCluster[lbl].push({ x: parseFloat(r.PC1), y: parseFloat(r.PC2) });
+        byCluster[lbl].push({ x:parseFloat(r.PC1), y:parseFloat(r.PC2) });
       });
-      const datasets = Object.entries(byCluster).map(([lbl, pts]) => ({
+      const datasets = Object.entries(byCluster).map(([lbl,pts]) => ({
         label: KM_NAMES[parseInt(lbl)] || `Cluster ${lbl}`,
         data: pts,
-        backgroundColor: (KM_COLORS[parseInt(lbl)] || '#999') + 'aa',
+        backgroundColor: (KM_COLORS[parseInt(lbl)]||'#999')+'aa',
         pointRadius: 3
       }));
       buildChart(datasets, `PCA 2D — K-Means Clusters (${rows.length.toLocaleString()} data)`);
-      status.textContent = `Data asli dimuat: ${rows.length.toLocaleString()} titik dari pca_result.csv`;
+      stat.textContent = `Data asli: ${rows.length.toLocaleString()} titik dimuat`;
     },
     error() { useDemoData(); }
   });
 }
 
+// ═══ initPrediksi ═════════════════════════════════════════════════════════════
 function initPrediksi() {
-  const fieldsDiv = document.getElementById('predict-fields');
-  fieldsDiv.innerHTML = PREDICT_FIELDS.map(f =>
+  document.getElementById('predict-fields').innerHTML = PREDICT_FIELDS.map(f =>
     `<div class="form-group">
       <label for="${f.id}">${f.label}</label>
-      <input type="number" id="${f.id}" name="${f.id}" placeholder="${f.placeholder}" value="${f.def}" step="any">
+      <input type="number" id="${f.id}" name="${f.id}" value="${f.def}" step="${f.step}">
     </div>`
   ).join('');
 
@@ -640,41 +866,108 @@ function initPrediksi() {
   const resGrid = document.getElementById('result-grid');
   const spin    = document.getElementById('predict-btn-spin');
 
+  function localFallback(body) {
+    const ca=body.CASH_ADVANCE, pur=body.PURCHASES, pfp=body.PRC_FULL_PAYMENT;
+    let km, kn;
+    if (ca>3000){ km=2; kn="Nasabah Revolving/Berisiko"; }
+    else if (pur>2000&&pfp>0.25){ km=0; kn="Nasabah Pasif"; }
+    else { km=1; kn="Nasabah Aktif Moderat"; }
+    return {
+      kmeans:{ cluster:km, nama:kn },
+      dbscan:{ cluster:pur>500?1:0, is_noise:false, label_text:`Cluster ${pur>500?1:0}` },
+      pca_coordinates:{ PC1:0, PC2:0 }, mode:"simulasi"
+    };
+  }
+
+  function showMiniScatter(pc1, pc2, kmCluster) {
+    const KM_COLORS = ['#1565c01a','#2e7d321a','#b71c1c1a'];
+    const KM_SOLID  = ['#1565c088','#2e7d3288','#b71c1c88'];
+    const KM_NAMES  = ['Cluster 0','Cluster 1','Cluster 2'];
+
+    const pts = _pcaData.length > 0 ? _pcaData : (() => {
+      const res=[], centers=[[-2.5,-1],[0.5,1.5],[3,-0.5]];
+      centers.forEach((c,i) => {
+        for(let j=0;j<80;j++) res.push({x:c[0]+(Math.random()-.5)*3, y:c[1]+(Math.random()-.5)*3, km:i});
+      });
+      return res;
+    })();
+
+    const byC = {0:[],1:[],2:[]};
+    pts.forEach(p => { if(byC[p.km]) byC[p.km].push({x:p.x,y:p.y}); });
+
+    const datasets = [0,1,2].map(c => ({
+      label: KM_NAMES[c],
+      data: byC[c],
+      backgroundColor: KM_COLORS[c],
+      pointRadius: 2,
+      pointHoverRadius: 3
+    }));
+
+    // Predicted point
+    datasets.push({
+      label: '📍 Posisi Anda',
+      data: [{ x:pc1, y:pc2 }],
+      backgroundColor: '#f44336',
+      pointRadius: 9,
+      pointHoverRadius: 12,
+      pointStyle: 'star'
+    });
+
+    if (_miniScatterChart) _miniScatterChart.destroy();
+    const ctx2 = document.getElementById('mini-scatter-chart').getContext('2d');
+    _miniScatterChart = new Chart(ctx2, {
+      type:'scatter',
+      data:{ datasets },
+      options:{
+        responsive:true,
+        animation:{ duration:600 },
+        plugins:{
+          legend:{ display:false },
+          tooltip:{ callbacks:{ label: p => p.dataset.label==='📍 Posisi Anda'
+            ? `Anda: PC1=${p.parsed.x.toFixed(2)}, PC2=${p.parsed.y.toFixed(2)}`
+            : `${p.dataset.label}: ${p.parsed.x.toFixed(2)},${p.parsed.y.toFixed(2)}`
+          }}
+        },
+        scales:{
+          x:{ title:{ display:true, text:'PC1', font:{size:10} }, ticks:{font:{size:9}} },
+          y:{ title:{ display:true, text:'PC2', font:{size:10} }, ticks:{font:{size:9}} }
+        }
+      }
+    });
+  }
+
   function showResult(data) {
     const km = data.kmeans || {};
     const db = data.dbscan || {};
     const pc = data.pca_coordinates || {};
     const mode = data.mode || 'simulasi';
+    const kmLbl = km.cluster !== undefined ? km.cluster : 1;
+    const risk = RISK_MAP[db.is_noise ? '-1' : kmLbl] || RISK_MAP[1];
+
     resGrid.innerHTML =
       `<div class="result-item">
         <div class="r-label">K-Means Cluster</div>
-        <div class="r-value">${km.nama || 'Cluster ' + km.cluster}</div>
+        <div class="r-value">${km.nama || 'Cluster '+kmLbl}</div>
         <span class="mode-badge ${mode}">${mode}</span>
       </div>
       <div class="result-item">
         <div class="r-label">DBSCAN Label</div>
-        <div class="r-value">${db.is_noise ? '⚠️ Outlier/Noise' : db.label_text}</div>
+        <div class="r-value">${db.is_noise ? '⚠️ Outlier/Noise' : db.label_text || 'Cluster '+db.cluster}</div>
       </div>
       <div class="result-item">
         <div class="r-label">Koordinat PCA</div>
         <div class="r-value" style="font-size:.95rem">PC1: ${(pc.PC1||0).toFixed(2)}<br>PC2: ${(pc.PC2||0).toFixed(2)}</div>
       </div>`;
-    resBox.classList.add('show');
-  }
 
-  function localFallback(body) {
-    const ba = body.BALANCE, pur = body.PURCHASES, ca = body.CASH_ADVANCE, pfp = body.PRC_FULL_PAYMENT;
-    let kmLbl, kmName;
-    if (ca > 3000) { kmLbl = 2; kmName = "Nasabah Revolving/Berisiko"; }
-    else if (pur > 2000 && pfp > 0.25) { kmLbl = 0; kmName = "Nasabah Pasif"; }
-    else { kmLbl = 1; kmName = "Nasabah Aktif Moderat"; }
-    const dbLbl = pur > 500 ? 1 : 0;
-    return {
-      kmeans: { cluster: kmLbl, nama: kmName },
-      dbscan: { cluster: dbLbl, is_noise: false, label_text: `Cluster ${dbLbl}` },
-      pca_coordinates: { PC1: 0, PC2: 0 },
-      mode: "simulasi"
-    };
+    document.getElementById('risk-box').innerHTML =
+      `<div class="risk-title">Skor Risiko Kredit</div>
+      <div class="risk-badge" style="background:${risk.bg};color:${risk.color}">
+        <span style="font-size:1.1rem">${risk.icon}</span> ${risk.score}
+      </div>
+      <ul class="risk-recs">${risk.recs.map(r => `<li>${r}</li>`).join('')}</ul>`;
+
+    resBox.classList.add('show');
+    showMiniScatter(pc.PC1||0, pc.PC2||0, kmLbl);
   }
 
   form.addEventListener('submit', async e => {
@@ -684,13 +977,10 @@ function initPrediksi() {
     PREDICT_FIELDS.forEach(f => { body[f.id] = parseFloat(document.getElementById(f.id).value) || 0; });
     try {
       const res = await fetch('/api/predict', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
+        method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)
       });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const data = await res.json();
-      showResult(data);
+      if (!res.ok) throw new Error('HTTP '+res.status);
+      showResult(await res.json());
     } catch {
       showResult(localFallback(body));
     } finally {
@@ -699,30 +989,86 @@ function initPrediksi() {
   });
 }
 
+// ═══ initAPIStatus ════════════════════════════════════════════════════════════
 function initAPIStatus() {
-  const dot  = document.getElementById('api-dot');
-  const text = document.getElementById('api-text');
+  const dot=document.getElementById('api-dot'), text=document.getElementById('api-text');
   fetch('/api/health')
-    .then(r => r.json())
-    .then(d => {
-      dot.classList.add('ok');
-      text.textContent = 'API Online — ' + (d.timestamp || '').substring(0, 10);
-    })
-    .catch(() => {
-      dot.classList.add('err');
-      text.textContent = 'API Offline — Mode Simulasi Aktif';
-    });
+    .then(r=>r.json())
+    .then(d=>{ dot.classList.add('ok'); text.textContent='API Online — '+(d.timestamp||'').substring(0,10); })
+    .catch(()=>{ dot.classList.add('err'); text.textContent='API Offline — Mode Simulasi Aktif'; });
 }
 
+// ═══ initDownload ═════════════════════════════════════════════════════════════
 function initDownload() {
   document.getElementById('download-links').innerHTML = DOWNLOAD_FILES.map(f =>
     `<a href="${f.href}" class="btn-dl" download>${f.label}</a>`
   ).join('');
 }
 
-// ─── BOOT ──────────────────────────────────────────────────────────────────────
+// ═══ initNavActiveState ═══════════════════════════════════════════════════════
+function initNavActiveState() {
+  const sections = Array.from(document.querySelectorAll('section[id]'));
+  const navItems = Array.from(document.querySelectorAll('.nav-item[href^="#"]'));
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navItems.forEach(a => a.classList.toggle('active', a.getAttribute('href')==='#'+id));
+      }
+    });
+  }, { threshold:0.25, rootMargin:'-60px 0px -60% 0px' });
+  sections.forEach(s => obs.observe(s));
+}
+
+// ═══ initSectionFadeIn ════════════════════════════════════════════════════════
+function initSectionFadeIn() {
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) { entry.target.classList.add('visible'); obs.unobserve(entry.target); }
+    });
+  }, { threshold:0.06 });
+  document.querySelectorAll('.fade-section').forEach(s => obs.observe(s));
+}
+
+// ═══ initCounterAnimation ═════════════════════════════════════════════════════
+function initCounterAnimation() {
+  const overview = document.getElementById('overview');
+  let triggered = false;
+  const obs = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting && !triggered) {
+      triggered = true;
+      document.querySelectorAll('#stat-grid .val').forEach(el => {
+        const target   = parseFloat(el.dataset.target);
+        const decimals = parseInt(el.dataset.decimals) || 0;
+        const duration = decimals > 0 ? 1200 : (target > 1000 ? 1600 : 900);
+        let start = null;
+        const fmt = v => decimals>0 ? v.toFixed(decimals) : Math.round(v).toLocaleString('id-ID');
+        const step = ts => {
+          if (!start) start = ts;
+          const pct = Math.min((ts-start)/duration, 1);
+          const eased = 1-Math.pow(1-pct,3);
+          el.textContent = fmt(target*eased);
+          if (pct<1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      });
+      obs.unobserve(overview);
+    }
+  }, { threshold:0.4 });
+  obs.observe(overview);
+}
+
+// ═══ initBackToTop ════════════════════════════════════════════════════════════
+function initBackToTop() {
+  const btn = document.getElementById('back-top');
+  window.addEventListener('scroll', () => btn.classList.toggle('show', window.scrollY>500), {passive:true});
+  btn.addEventListener('click', () => window.scrollTo({top:0,behavior:'smooth'}));
+}
+
+// ═══ BOOT ═════════════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
   initStats();
+  initStatistikDeskriptif();
   initTabel();
   initAlgo();
   initMetodologi();
@@ -733,6 +1079,10 @@ document.addEventListener('DOMContentLoaded', () => {
   initPrediksi();
   initAPIStatus();
   initDownload();
+  initNavActiveState();
+  initSectionFadeIn();
+  initCounterAnimation();
+  initBackToTop();
 });
 </script>
 </body>
