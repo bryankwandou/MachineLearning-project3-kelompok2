@@ -4,13 +4,33 @@
     {
       "src": "api/predict.py",
       "use": "@vercel/python",
-      "config": { "maxLambdaSize": "50mb" }
+      "config": {
+        "maxLambdaSize": "50mb",
+        "includeFiles": ["models/**", "data/**"]
+      }
+    },
+    {
+      "src": "frontend/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "data/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "reports/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "models/metadata.json",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/predict.py" },
     { "src": "/data/(.*)", "dest": "/data/$1" },
     { "src": "/reports/(.*)", "dest": "/reports/$1" },
+    { "src": "/models/(.*)", "dest": "/models/$1" },
     { "src": "/", "dest": "/frontend/index.html" },
     { "src": "/(.*)", "dest": "/frontend/$1" }
   ]
