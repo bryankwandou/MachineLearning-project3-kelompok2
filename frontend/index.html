@@ -517,14 +517,14 @@ const META = {
 };
 
 const STATS_TABLE = [
-  { f:"BALANCE",          min:0,    max:19043, mean:1564.47, std:2081.42 },
-  { f:"PURCHASES",        min:0,    max:49040, mean:1003.20, std:2136.52 },
-  { f:"CASH_ADVANCE",     min:0,    max:47137, mean:978.87,  std:2097.05 },
-  { f:"CREDIT_LIMIT",     min:50,   max:30000, mean:4494.28, std:3638.44 },
-  { f:"PAYMENTS",         min:0,    max:50721, mean:1733.14, std:2894.90 },
-  { f:"MINIMUM_PAYMENTS", min:0,    max:76406, mean:844.91,  std:2332.66 },
-  { f:"PRC_FULL_PAYMENT", min:0,    max:1,     mean:0.15,    std:0.29    },
-  { f:"TENURE",           min:6,    max:12,    mean:11.52,   std:1.34    }
+  { f:"BALANCE",          min:0,    max:19043.14, mean:1564.47, std:2081.53 },
+  { f:"PURCHASES",        min:0,    max:49039.57, mean:1003.20, std:2136.63 },
+  { f:"CASH_ADVANCE",     min:0,    max:47137.21, mean:978.87,  std:2097.16 },
+  { f:"CREDIT_LIMIT",     min:50,   max:30000,    mean:4494.28, std:3638.65 },
+  { f:"PAYMENTS",         min:0,    max:50721.48, mean:1733.14, std:2895.06 },
+  { f:"MINIMUM_PAYMENTS", min:0.02, max:76406.21, mean:844.91,  std:2332.79 },
+  { f:"PRC_FULL_PAYMENT", min:0,    max:1,        mean:0.15,    std:0.29    },
+  { f:"TENURE",           min:6,    max:12,       mean:11.52,   std:1.34    }
 ];
 
 // Actual cluster mini-bar % (normalized to global max per feature)
@@ -536,10 +536,10 @@ const CLUSTER_MINI = {
 
 // Outlier stats (49 noise points vs all)
 const OUTLIER_STATS = {
-  CASH_ADVANCE:      { noise:5545.8,  all:978.9,  ratio:5.7  },
-  BALANCE:           { noise:6578.2,  all:1564.5, ratio:4.2  },
-  MINIMUM_PAYMENTS:  { noise:10820.0, all:844.9,  ratio:12.8 },
-  PRC_FULL_PAYMENT:  { noise:0.3,     all:0.2,    ratio:2.2  }
+  CASH_ADVANCE:      { noise:5545.78, all:978.87,  ratio:5.67  },
+  BALANCE:           { noise:6578.24, all:1564.47, ratio:4.20  },
+  MINIMUM_PAYMENTS:  { noise:10820.04,all:844.91,  ratio:12.81 },
+  PRC_FULL_PAYMENT:  { noise:0.34,    all:0.15,    ratio:2.19  }
 };
 
 const INTERPRETASI = [

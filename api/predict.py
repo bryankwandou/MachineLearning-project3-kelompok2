@@ -1,6 +1,7 @@
 """
 Flask API — Project 3 ML Kelompok B
 Serves /api/* endpoints with hardcoded fallback if models unavailable.
+Models are loaded once at module level and cached for warm Lambda reuse.
 """
 import os, json, datetime, traceback
 from flask import Flask, request, jsonify
@@ -12,6 +13,42 @@ CORS(app, resources={r"/*": {"origins":"*","methods":["GET","POST","OPTIONS"],"a
 BASE    = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODEL_D = os.path.join(BASE, 'models')
 DATA_D  = os.path.join(BASE, 'data')
+
+FEATURES = [
+    'BALANCE','BALANCE_FREQUENCY','PURCHASES','ONEOFF_PURCHASES',
+    'INSTALLMENTS_PURCHASES','CASH_ADVANCE','PURCHASES_FREQUENCY',
+    'ONEOFF_PURCHASES_FREQUENCY','PURCHASES_INSTALLMENTS_FREQUENCY',
+    'CASH_ADVANCE_FREQUENCY','CASH_ADVANCE_TRX','PURCHASES_TRX',
+    'CREDIT_LIMIT','PAYMENTS','MINIMUM_PAYMENTS','PRC_FULL_PAYMENT','TENURE'
+]
+
+# Module-level cache — loaded once on cold start, reused on warm invocations.
+_M = {}
+
+def _load_models():
+    """Load all ML artifacts once and cache in _M. Safe to call repeatedly."""
+    if _M.get('ready'):
+        return True
+    try:
+        import joblib, numpy as np, pandas as pd
+        from sklearn.neighbors import NearestNeighbors
+        imp = joblib.load(os.path.join(MODEL_D, 'imputer.pkl'))
+        sc  = joblib.load(os.path.join(MODEL_D, 'scaler.pkl'))
+        pca = joblib.load(os.path.join(MODEL_D, 'pca.pkl'))
+        km  = joblib.load(os.path.join(MODEL_D, 'kmeans_final.pkl'))
+        df  = pd.read_csv(os.path.join(DATA_D, 'hasil_clustering.csv'))
+        X_tr = sc.transform(imp.transform(df[FEATURES].values))
+        nn   = NearestNeighbors(n_neighbors=7).fit(X_tr)
+        _M.update({'imp':imp,'sc':sc,'pca':pca,'km':km,
+                   'nn':nn,'db_labels':df['DBSCAN_Label'].values,'ready':True})
+        print("Models loaded and cached.")
+        return True
+    except Exception as e:
+        print(f"Model load failed: {e}")
+        return False
+
+# Attempt warm load at import time (cold start).
+_load_models()
 
 METADATA_STATIS = {
     "nama_proyek": "Project 3 ML Kelompok B",
@@ -69,51 +106,35 @@ def predict():
         pfp  = float(data.get('PRC_FULL_PAYMENT', data.get('prc_full_payment', 0)))
         ten  = float(data.get('TENURE', data.get('tenure', 12)))
 
-        # Try real model prediction
-        try:
-            import joblib, numpy as np
-            FEATURES = ['BALANCE','BALANCE_FREQUENCY','PURCHASES','ONEOFF_PURCHASES',
-                        'INSTALLMENTS_PURCHASES','CASH_ADVANCE','PURCHASES_FREQUENCY',
-                        'ONEOFF_PURCHASES_FREQUENCY','PURCHASES_INSTALLMENTS_FREQUENCY',
-                        'CASH_ADVANCE_FREQUENCY','CASH_ADVANCE_TRX','PURCHASES_TRX',
-                        'CREDIT_LIMIT','PAYMENTS','MINIMUM_PAYMENTS','PRC_FULL_PAYMENT','TENURE']
-            imp = joblib.load(os.path.join(MODEL_D,'imputer.pkl'))
-            sc  = joblib.load(os.path.join(MODEL_D,'scaler.pkl'))
-            pca = joblib.load(os.path.join(MODEL_D,'pca.pkl'))
-            km  = joblib.load(os.path.join(MODEL_D,'kmeans_final.pkl'))
-            full = {f: float(data.get(f,0)) for f in FEATURES}
-            full['BALANCE']=bal; full['PURCHASES']=pur; full['CASH_ADVANCE']=ca
-            full['CREDIT_LIMIT']=cl; full['PRC_FULL_PAYMENT']=pfp; full['TENURE']=ten
-            X = np.array([full[f] for f in FEATURES]).reshape(1,-1)
-            X_imp = imp.transform(X); X_sc = sc.transform(X_imp)
-            X_pca = pca.transform(X_sc)
-            km_lbl = int(km.predict(X_sc)[0])
-            # DBSCAN kNN
+        # Use cached models (loaded at cold start, reused on warm invocations)
+        if _M.get('ready') or _load_models():
             try:
-                import pandas as pd
-                from sklearn.neighbors import NearestNeighbors
+                import numpy as np
                 from collections import Counter
-                db = joblib.load(os.path.join(MODEL_D,'dbscan_final.pkl'))
-                df_h = pd.read_csv(os.path.join(DATA_D,'hasil_clustering.csv'))
-                Xtr = sc.transform(imp.transform(df_h[FEATURES].values))
-                nb  = NearestNeighbors(n_neighbors=7).fit(Xtr)
-                _, idx = nb.kneighbors(X_sc)
-                nbrs = df_h['DBSCAN_Label'].values[idx[0]]
-                v = nbrs[nbrs != -1]
-                db_lbl = int(Counter(v).most_common(1)[0][0]) if len(v) else -1
-            except:
-                db_lbl = 0
-            return jsonify({
-                "kmeans":{"cluster":km_lbl,"nama":CLUSTER_NAMES.get(km_lbl,f"Cluster {km_lbl}")},
-                "dbscan":{"cluster":db_lbl,"is_noise":db_lbl==-1,
-                          "label_text":"Outlier/Noise" if db_lbl==-1 else f"Cluster {db_lbl}"},
-                "pca_coordinates":{"PC1":float(X_pca[0,0]),"PC2":float(X_pca[0,1])},
-                "mode":"model"
-            })
-        except Exception as em:
-            print(f"Model predict failed: {em}")
+                full = {f: float(data.get(f, 0)) for f in FEATURES}
+                full.update({'BALANCE':bal,'PURCHASES':pur,'CASH_ADVANCE':ca,
+                             'CREDIT_LIMIT':cl,'PRC_FULL_PAYMENT':pfp,'TENURE':ten})
+                X     = np.array([full[f] for f in FEATURES]).reshape(1, -1)
+                X_imp = _M['imp'].transform(X)
+                X_sc  = _M['sc'].transform(X_imp)
+                X_pca = _M['pca'].transform(X_sc)
+                km_lbl = int(_M['km'].predict(X_sc)[0])
+                # DBSCAN via pre-fitted kNN (no CSV reload, no refit)
+                _, idx = _M['nn'].kneighbors(X_sc)
+                nbrs   = _M['db_labels'][idx[0]]
+                valid  = nbrs[nbrs != -1]
+                db_lbl = int(Counter(valid).most_common(1)[0][0]) if len(valid) else -1
+                return jsonify({
+                    "kmeans": {"cluster": km_lbl, "nama": CLUSTER_NAMES.get(km_lbl, f"Cluster {km_lbl}")},
+                    "dbscan": {"cluster": db_lbl, "is_noise": db_lbl == -1,
+                               "label_text": "Outlier/Noise" if db_lbl == -1 else f"Cluster {db_lbl}"},
+                    "pca_coordinates": {"PC1": float(X_pca[0, 0]), "PC2": float(X_pca[0, 1])},
+                    "mode": "model"
+                })
+            except Exception as em:
+                print(f"Model predict failed: {em}")
 
-        # Rule-based fallback
+        # Rule-based fallback (models unavailable)
         if ca > 3000:
             km_lbl, km_name = 2, "Nasabah Revolving/Berisiko"
         elif pur > 2000 and pfp > 0.25:
@@ -122,14 +143,14 @@ def predict():
             km_lbl, km_name = 1, "Nasabah Aktif Moderat"
         db_lbl = 1 if pur > 500 else 0
         return jsonify({
-            "kmeans":{"cluster":km_lbl,"nama":km_name},
-            "dbscan":{"cluster":db_lbl,"is_noise":False,"label_text":f"Cluster {db_lbl}"},
-            "pca_coordinates":{"PC1":0.0,"PC2":0.0},
-            "mode":"simulasi"
+            "kmeans": {"cluster": km_lbl, "nama": km_name},
+            "dbscan": {"cluster": db_lbl, "is_noise": False, "label_text": f"Cluster {db_lbl}"},
+            "pca_coordinates": {"PC1": 0.0, "PC2": 0.0},
+            "mode": "simulasi"
         })
     except Exception as e:
         print(f"ERROR /api/predict: {traceback.format_exc()}")
-        return jsonify({"error":str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0', port=5000)
